@@ -73,7 +73,7 @@ export default [ // 导航栏配置
             { text: '前端工程化', link: '/article/前端工程化/前端工程化.md' },
             { text: '前端渲染架构', link: '/article/前端工程化/前端渲染架构.md' },
             { text: '前端架构实践', link: '/article/前端工程化/前端架构实践.md' },
-            { text: '自动构建和部署', link: '/article/项目部署/自动构建和部署.md' },
+            { text: '前端CICD', link: '/article/前端CICD/自动构建和部署.md' },
             { text: '前端组件化', link: '/article/前端组件化/Vue组件基础.md' },
             { text: '前端模块化', link: '/article/前端工程化/前端模块化.md' },
             { text: '包管理器', link: '/article/npm/npm与pnpm.md' },
@@ -84,7 +84,7 @@ export default [ // 导航栏配置
         text: '项目实践',
         ariaLabel: '项目实践',
         children: [
-            { text: '前端部署', link: '/article/项目部署/前端部署原理.md' },
+            { text: '前端部署', link: '/article/前端CICD/前端部署原理.md' },
             { text: '登录与单点登录', link: '/article/项目总结/登录与单点登录.md' },
             { text: '权限管理方案实践', link: '/article/项目总结/权限管理方案实践.md' },
             { text: 'Echarts二次封装实践', link: '/article/项目总结/Echarts二次封装实践.md' },
