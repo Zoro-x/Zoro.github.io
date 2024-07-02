@@ -1,5 +1,6 @@
 ---
 star: true
+sticky: true
 category:
   - 项目总结
 tag:

@@ -1,3 +1,13 @@
+---
+star: start
+order: 2
+category:
+  - Vue
+tag:
+  - Vue2
+  - Vue2源码分析
+---
+
 # Vue2 API原理分析
 
 ## 全局API

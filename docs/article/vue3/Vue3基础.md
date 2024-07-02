@@ -1,5 +1,5 @@
 ---
-star: true
+star: false
 category:
   - Vue
 tag:

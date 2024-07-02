@@ -1,5 +1,6 @@
 ---
 star: true
+order: 6
 category:
   - 源码分析
   - Vue

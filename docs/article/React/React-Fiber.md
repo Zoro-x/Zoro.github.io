@@ -1,6 +1,7 @@
 ---
 star: true
 order: 3
+sticky: true
 category:
   - React
 tag:
