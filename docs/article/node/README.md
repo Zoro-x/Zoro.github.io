@@ -357,9 +357,404 @@ module.exports = [getReqParams, validateReqParams, responseFormatter, responseEr
 
 
 
+### 文件路径别名中间件
+
+> 文件路径别名中间件：通过给指定路径设置别名。
+>
+> 文件路径解析中间件，将文件路径转为对象，将文件内容挂载到 app 实例对象，便于获取文件上下文，将 controllers 中的文件位置映射为应用对象
+
+```js
+/**
+ * 文件路径解析中间件，将文件路径转为对象，将文件内容挂载到 app 实例对象，便于获取文件上下文
+ * 将 controllers 中的文件位置映射为应用对象
+ */
+const Path = require('path')
+const { getFiles } = require('../utils/File.js')
+module.exports = (app, options = {}) => {
+  const { rules = [] } = options
+  const defaultRules = [
+    {
+      // 获取控制器下所有文件
+      path: Path.join(__dirname, '../controllers'),
+      name: 'controllers',
+      onlyIndexFiles: true, // 是否仅仅识别 index.js 文件
+      content: {}
+    },
+    {
+      // 获取路由下所有文件
+      path: Path.join(__dirname, '../routers/modules'),
+      name: 'routers',
+      onlyIndexFiles: false,
+      content: {}
+    }
+  ]
+  if (!app) {
+    throw new Error('the app params is necessary!')
+  }
+  rulesArray = [...rules, ...defaultRules]
+  const appKeys = Object.keys(app)
+  if (rulesArray.length > 0) {
+    rulesArray.forEach(item => {
+      let { path, name, content, onlyIndexFiles } = item
+      if (appKeys.includes(name)) {
+        throw new Error(`the name of ${name} already exists!`)
+      }
+      getFiles({ path, content, onlyIndexFiles })
+      app[name] = content
+    })
+  }
+}
+
+```
+
+
+
+
+
+## **express 流程**
+
+![](../images/未命名绘图.drawio.png)
+
+### MVC模式概述
+
+MVC是一种软件设计模式，它将应用程序分为三个核心部分：模型（Model）、视图（View）和控制器（Controller），旨在提高代码的可维护性、可重用性和可测试性。
+
+- **模型（Model）**：代表数据和业务逻辑，是应用程序的核心。在Node.js应用中，这通常包括数据库交互、数据验证等。
+- **视图（View）**：负责呈现数据给用户，通常是HTML页面或其他格式的文档。在Express应用中，视图可以是通过模板引擎（如EJS、Pug等）渲染的HTML文件。
+- **控制器（Controller）**：处理用户的输入，调用模型和视图完成用户的请求。在Express应用中，控制器通常是由路由处理函数和中间件组成的。
+
+* **服务层（Service ）**：处理业务逻辑。服务层包含复杂的业务规则和数据处理逻辑。
+
+> 下面以 **[go-view-node](https://github.com/Sewar-x/go-view-node)** 项目为例，说明 express 的流程。
+
+### 1.初始化
+
+1. 创建 express 实例 app;
+2. 在 express 实例中 app，挂载对象：
+   * 将文件路径转为对象挂载到 app 上，便于获取文件上下文；
+   * 挂载数据库模型对象；
+   * 挂载中间件;
+3. 在 app 中挂载路由，并注册所有路由，添加公共路由前缀；
+4. express app 实例启动 http 服务，并监听指定端口号；
+
+
+
+在项目中通过运行 `src/server.js` 脚本，启动一个 node express 服务：
+
+![](../images/image-20240702183202906.png)
+
+### 2.配置中间件
+
+中间件（Middleware） 本质上是一个函数，可以访问请求对象（`req`）、响应对象（`res`）和应用程序的请求/响应循环中的下一个中间件函数。
+
+当Express接收到一个HTTP请求时，它会根据请求的路径和HTTP方法，在内部中间件堆栈中查找匹配的中间件函数。
+
+**`app.use()` 允许你将这些中间件函数添加到这个堆栈中**。
+
+**堆栈中的执行顺序**： 当请求到达Express应用程序时，请求会按照中间件在堆栈中注册的顺序进行处理。
+
+每个中间件函数都可以决定是否调用`next()`函数来将控制权传递给堆栈中的下一个中间件，或者是否通过发送HTTP响应来结束请求/响应循环。
+
+**中间件函数可以执行以下任务**：
+
+- 执行代码。
+- 修改请求和响应对象。
+- 结束请求-响应循环。
+- 调用堆栈中的下一个中间件。
+
+
+
+常用的中间件包括：
+
+- 静态文件服务（如`express.static`用于托管静态文件如HTML、CSS、图片等）。
+- 请求体解析（如`body-parser`，虽然Express 4.16.0+已内置了`express.json()`和`express.urlencoded()`）。
+- 路由（如`express.Router()`）。
+- 错误处理。
+
+
+
+在项目中，通过 `src/middleware` 集中管理中间件：
+
+![](../images/image-20240702184149846.png)
+
+
+
+
+
+### 3. 定义路由
+
+路由决定了应用如何响应客户端对特定端点的请求。你可以使用`app.METHOD(path, callback)`来定义路由，其中`METHOD`是HTTP请求方法（如`GET`、`POST`等），`path`是URL路径，`callback`是当路由匹配时执行的函数。
+
+```javascript
+app.get('/user', (req, res) => {  
+  res.send('User profile');  
+});
+```
+
+路由第一个参数是匹配路径，第二个参数是路由的控制器方法。
+
+处理用户的输入，调用模型和视图完成用户的请求。
+
+在Express应用中，控制器通常是由路由处理函数和中间件组成的。
+
+
+
+**项目路由分析：**
+
+1. 项目中，在初始化时通过 pathParse 中间件将 `src/routers/modules` 下所有路由文件挂载到  app.routers 对象；
+
+2.  挂载路由时，通过遍历所有路由文件，注册所有路由；
+
+   
+
+![image-20240702191959583](C:\Users\wen6.xu\AppData\Roaming\Typora\typora-user-images\image-20240702191959583.png)
+
+
+
+
+
+### 4. 接收请求
+
+当客户端（如浏览器或移动应用）通过HTTP请求访问你的Express应用时，请求首先被Express的HTTP服务器监听器捕获。
+
+服务器监听器根据请求的URL和HTTP方法（如GET、POST等）将请求转发给相应的路由 控制器 处理函数。
+
+
+
+在项目中，通过路由控制器处理请求：
+
+![](../images/image-20240702192327745.png)
+
+> 如上图，当请求 `/goview/sys/login` 到达时，会通过 `app.controllers.login.login` 控制器处理该请求（`app.controllers.login.login`  是一个控制器，`app.controllers` 是通过 pathParse 中间件 将 `src/controllers` 文件夹下所有文件模块挂载的对象）
+
+
+
+### 5. 处理请求（控制器层处理）
+
+#### **控制器层处理**
+
+**1. 接收和处理用户请求**
+
+- **接收请求**：控制器层是应用程序的入口点，负责接收来自用户（通常是通过前端界面）的请求。这些请求可能包含各种信息，如路径、参数、请求体等。
+- **解析请求**：控制器层需要解析这些请求，理解用户的意图，并准备相应的处理逻辑。
+  - 控制器中获取到路由中传入的回调方法参数：请求体 request, 响应体：response,  next 方法。
+
+
+
+控制器中为用户的实际处理逻辑：
+
+![](../images/image-20240702192925601.png)
+
+> 控制器中进行接口处理逻辑，在控制器中接收三个参数：
+>
+> * 访问请求对象（`req`）
+> * 响应对象（`res`）
+> * 应用程序的请求/响应循环中的下一个中间件函数
+>
+> 控制器中可以调用模型，获取用户数据，也可以调用 Service 层进行处理。
+
+
+
+
+
+**2. 调用服务层处理业务逻辑**
+
+- **转发请求**：控制器层在理解用户请求后，会根据请求的内容调用相应的服务层（Service Layer）来处理业务逻辑。服务层包含复杂的业务规则和数据处理逻辑。
+- **接收响应**：服务层处理完业务逻辑后，会将结果返回给控制器层。
+
+![](../images/image-20240702193833060.png)
+
+
+
+#### **服务层处理**
+
+* 服务层调用模型层获取数据，或直接处理
+
+![](../images/image-20240702194121799.png)
+
+
+
+#### **模型层处理**
+
+* 模型层可以封装数据访问逻辑，如数据验证、数据库查询等，供控制器调用。
+
+* 在路由处理函数中，你可以执行各种操作来处理请求，如读取请求体中的数据、查询数据库、进行逻辑处理等。
+* 在Express项目中实现Model层，你通常需要选择一个ORM（Object-Relational Mapping）库来帮助你处理数据库操作。ORM允许你使用高级编程语言（如JavaScript）中的类和对象来操作数据库，而无需编写原始的SQL语句。
+
+
+
+**项目分析：**
+
+项目中使用 sequelize 作为 ORM 库操作数据库，并对 进行二次封装，封装成了一个 DB 类：
+
+>  DB 类用于初始化 sequelize 并加载指定文件夹下的所有模型文件。
+
+```js
+
+/**
+ * ==================================================
+ *  数据库模型对象
+ * ==================================================
+ */
+
+'use strict'
+const fs = require('fs')
+const path = require('path')
+const { Sequelize, DataTypes } = require('sequelize')
+
+class DB {
+  //构造函数
+  constructor({ database, sequelizeConfig, knexConfig, logging, DEBUG = true }) {
+    try {
+      //创建一个sequelize实例
+      this.sequelize = new Sequelize(sequelizeConfig.database, sequelizeConfig.username, sequelizeConfig.password, sequelizeConfig.connect, {
+        // 控制台输出查询日志
+        logging: logging.info,
+        // 事务隔离级别：可串行化(Serializable)
+        isolationLevel: Sequelize.Transaction.ISOLATION_LEVELS.SERIALIZABLE
+      })
+    } catch (err) {
+      console.error(err)
+    }
+
+    this.tabs = []
+    this.models = {}
+    this.dbType = database.DATABASE
+    this.dbName = database.DB_NAME
+  }
+
+  /**
+   * 加载指定路径下的所有模型，如果没有传入 路径，默认加载 models 路径下的模型
+   * @param {*} _path
+   * @returns
+   */
+  loadModel(_path) {
+    try {
+      // 获取 Models 的路径
+      const folderPath = _path || path.join(__dirname, '../../models')
+      // 获取models 下的文件夹和文件
+      const modelsFolder = fs.readdirSync(folderPath)
+      if (!modelsFolder || modelsFolder.length === 0) return false
+      // 过滤出 models 下的文件夹
+      const folders = modelsFolder.filter(file => {
+        // 过滤掉index.js，因为index.js就是这份代码
+        let fix = file.substring(file.lastIndexOf('.'), file.length) //后缀名
+        return fix.indexOf('.') !== 0 && file !== 'index.js' && fix !== '.js'
+      })
+      folders.forEach(foldersName => {
+        this.loadModelFiles(folderPath, foldersName)
+      })
+    } catch (err) {
+      console.log(err)
+    }
+
+    return this.modelAssociate()
+  }
+
+  /**
+   * 加载指定文件夹下的所有模型文件
+   * @param {*} parentFolder model 下文件夹
+   * @param {*} foldersName model 的文件夹目录名称
+   */
+  loadModelFiles(parentFolder, foldersName) {
+    // 获取 models 文件夹下的文件夹路径
+    const chilFolderPath = path.join(parentFolder, foldersName)
+    const folderFiles = fs.readdirSync(chilFolderPath)
+    folderFiles.forEach(fileName => {
+      //import的方式创建model，并把它存储到db这个对象中
+      const modelsFile = require(path.join(chilFolderPath, fileName))
+      let model = modelsFile(this.sequelize, DataTypes) // 6.x 版本写法
+      this.models[model.name] = model
+      this.tabs.push(model.name)
+    })
+  }
+
+  // 加载所有模型后调用 associate 方法以避免依赖性问题
+  async modelAssociate() {
+    let _models = this.models
+    Object.keys(_models).forEach(function (modelName) {
+      if ('associate' in _models[modelName]) {
+        _models[modelName].associate(_models)
+      }
+    })
+    this.models = _models
+    return _models
+  }
+
+  async hasConection() {
+    try {
+      return await sequelize.authenticate()
+    } catch (error) {
+      console.error('connect to db error ', error)
+      return false
+    }
+  }
+
+  // 一次同步所有模型,同步表结构,Sequelize 自动对数据库执行 SQL 查询.(请注意,这仅更改数据库中的表,而不更改 JavaScript 端的模型) 如果表不存在,则创建该表(如果已经存在,则不执行任何操作)
+  async sync() {
+    this.sequelize.sync({
+      // force: true //将创建表,如果表已经存在,则将其首先删除
+      // alter: true // - 这将检查数据库中表的当前状态(它具有哪些列,它们的数据类型等),然后在表中进行必要的更改以使其与模型匹配.
+    })
+  }
+}
+
+module.exports = DB
+
+```
+
+在项目初始化时，在入口文件中已经通过 ` models(app)` 方法对该 model 进行挂载，并同步所有模型：
+
+![](../images/image-20240702195829150.png)
+
+
+
+sequelize 模型对象定义：模型对象定义了数据库表中所有字段。
+
+![](../images/image-20240702200001771.png)
+
+
+
+**5. 返回响应给前端或视图层**
+
+- **选择视图或响应**：控制器层根据服务层返回的结果，选择合适的视图层（View Layer）进行展示，或者直接生成响应返回给客户端（如HTTP响应）。
+- **数据封装**：在将数据返回给前端或视图层之前，控制器层可能会对数据进行格式化或封装，以满足前端展示的需求。
+
+
+
+**项目分析：**
+
+最后在控制器中，处理模型层获取的数据并返回：
+
+![](../images/image-20240702200320363.png)
+
+
+
+
+
+### 6. 发送响应
+
+处理完请求后，你需要使用响应对象（`res`）来发送响应给客户端。这可以包括设置响应头（如`Content-Type`）、发送状态码（如200表示成功）、发送响应体（如HTML、JSON数据等）。
+
+```javascript
+app.get('/data', (req, res) => {  
+  res.json({ name: 'John Doe', age: 30 });  
+});
+```
+
+### 7. 结束请求-响应循环
+
+一旦响应被发送（无论是通过`res.send()`、`res.json()`等方法），Express将结束当前的请求-响应循环，并将控制权返回给Node.js的HTTP服务器，以便处理下一个请求。
+
+### 8. 错误处理
+
+在整个过程中，如果发生任何错误（如请求处理函数中的异常），Express允许你定义全局或路由特定的错误处理中间件来捕获和处理这些错误，确保应用的健壮性和用户体验。
+
+
+
 ## JWT 鉴权机制
 
-![image-20231216165846706](../images/JWT鉴权机制.png)
+![](../images/JWT鉴权机制.png)
 
 ### 概念
 
