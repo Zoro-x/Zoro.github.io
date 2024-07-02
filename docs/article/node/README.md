@@ -507,7 +507,7 @@ app.get('/user', (req, res) => {
 
    
 
-![image-20240702191959583](C:\Users\wen6.xu\AppData\Roaming\Typora\typora-user-images\image-20240702191959583.png)
+![](../images/image-20240702191959583.png)
 
 
 
