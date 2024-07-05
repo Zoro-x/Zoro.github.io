@@ -2,7 +2,7 @@
 star: true
 sticky: true
 category:
-  - 项目总结
+  - 移动端开发
 tag:
   - SSG项目
 ---

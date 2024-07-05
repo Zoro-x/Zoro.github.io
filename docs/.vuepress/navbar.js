@@ -98,8 +98,6 @@ export default [ // 导航栏配置
         children: [
             { text: '项目总结', link: '/article/项目总结/项目总结.md' },
             { text: '从零到一搭建SSR项目', link: '/article/项目总结/从零到一搭建SSR项目.md' },
-            { text: '从零到一搭建移动端SSG项目', link: '/article/项目总结/从零到一搭建移动端SSG项目.md' },
-            { text: '移动端SSG项目实践', link: '/article/项目总结/移动端SSG项目实践.md' },
             { text: '从零到一搭建Vue2工程化项目', link: '/article/项目总结/从零到一搭建Vue2工程化项目.md' },
             { text: '从零到一搭建Vue3工程化项目', link: '/article/项目总结/从零到一搭建Vue3工程化项目.md' },
             { text: '搭建低代码平台', link: '/article/项目总结/搭建低代码平台.md' },
@@ -115,6 +113,17 @@ export default [ // 导航栏配置
             { text: '微前端框架', link: '/article/微前端/微前端框架.md' },
             { text: '使用微前端重构项目', link: '/article/微前端/使用微前端重构项目.md' },
             { text: '从零到一搭建微前端项目模板', link: '/article/微前端/从零到一搭建微前端项目模板.md' },
+        ]
+    },
+    {
+        text: '移动端',
+        ariaLabel: '移动端',
+        children: [
+            { text: '从零到一搭建移动端SSG项目', link: '/article/移动端/从零到一搭建移动端SSG项目.md' },
+            { text: '移动端SSG项目实践', link: '/article/移动端/移动端SSG项目实践.md' },
+            { text: '移动端跨端框架', link: '/article/移动端/移动端跨端框架.md' },
+            { text: '小程序', link: '/article/移动端/小程序.md' },
+            { text: 'uniapp', link: '/article/移动端/uniapp.md' },
         ]
     },
     {
