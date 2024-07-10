@@ -6,8 +6,7 @@ export default [ // 导航栏配置
         ariaLabel: '计算机基础',
         children: [
             { text: '数据结构和算法', link: '/article/算法和数据结构/' },
-            { text: '计算机网络/HTTP', link: '/article/network/' },
-            { text: '输入url到页面展示全过程', link: '/article/network/输入url到页面展示全过程.md', activeMatch: "/article/network/输入url到页面展示全过程/", },
+            { text: '输入url到页面展示全过程', link: '/article/network/输入url到页面展示全过程.md'},
             { text: '操作系统', link: '/article/操作系统/' },
             { text: '设计模式', link: '/article/设计模式/' },
             { text: 'Web安全', link: '/article/Web安全/' }

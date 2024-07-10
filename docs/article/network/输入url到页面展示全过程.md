@@ -61,7 +61,7 @@ URL 解析发生在浏览器中, 解析输入浏览器地址栏中的 url 过程
 
 ![](../images/http缓存.png)
 
-* 详细过程查看[浏览器缓存机制](./### 浏览器缓存机制)
+> 强制缓存和协商缓存详细流程参考我的博客：[前端发版静态资源404问题 | Sewen 博客 (sewar-x.github.io)](https://sewar-x.github.io/myblog/article/前端CICD/前端发版静态资源404问题.html#浏览器缓存问题)
 
 ## 网络分层传输
 
