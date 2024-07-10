@@ -1,3 +1,12 @@
+---
+star: false
+order: 3
+category:
+  - 前端性能优化
+tag:
+  - 前端性能优化方案
+---
+
 # Vue性能优化
 
 ## 大纲
