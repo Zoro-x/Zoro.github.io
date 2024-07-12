@@ -2597,11 +2597,187 @@ React的核心API主要包括用于创建组件、管理状态、处理生命周
 |   `useLayoutEffect()`    | 其API与`useEffect`相同，但它会在所有的DOM变更之后同步调用effect |              `useLayoutEffect(() => { ... });`               |
 |    `useDebugValue()`     |      用于在React Developer Tools中显示自定义hook的标签       |                   `useDebugValue(value);`                    |
 
-这些API提供了构建React应用所需的基本功能，从创建和渲染组件，到管理状态和处理副作用，再到处理用户输入和生命周期事件。你可以根据具体的应用需求选择使用哪些API。
 
 
+
+
+## React Hooks
+
+| 钩子名称                                                     | 描述                                                         | 引入版本   |
+| ------------------------------------------------------------ | ------------------------------------------------------------ | ---------- |
+| `useState`                                                   | 用于在函数组件中添加本地状态                                 | React 16.8 |
+| `useEffect`                                                  | 用于在函数组件中执行副作用操作（如数据获取、订阅等）         | React 16.8 |
+| `useContext`                                                 | 允许在函数组件中订阅React的Context，从而能够跨组件层级访问数据 | React 16.8 |
+| `useRef`                                                     | 可以在组件的整个生命周期内保持对值的引用，常用于获取DOM元素  | React 16.8 |
+| `useReducer`                                                 | 使用reducer函数来管理组件的本地状态，适用于复杂的状态逻辑    | React 16.8 |
+| `useCallback`                                                | 返回一个记忆化的回调函数版本，该回调仅在依赖项改变时才会更新 | React 16.8 |
+| [`useMemo`](https://zh-hans.react.dev/reference/react/useMemo) | 返回一个记忆化的值，该值仅在依赖项改变时才会重新计算         | React 16.8 |
+| `useLayoutEffect`                                            | 在DOM更新完成后立即同步调用effect，但会在浏览器绘制之前执行  | React 16.8 |
+| `useImperativeHandle`                                        | 自定义使用`ref`时暴露给父组件的实例值                        | React 16.8 |
+| `useDebugValue`                                              | 在React Developer Tools中显示自定义Hook的标签                | React 16.8 |
+| `useDeferredValue`                                           | 允许组件在渲染过程中延迟读取某些值，以提高性能               | React 18   |
+| `useTransition`                                              | 允许你将状态更新标记为过渡，从而可以在更新时实现更平滑的UI   | React 18   |
+| `useOpaqueIdentifier`                                        | 生成一个不透明的标识符，用于在组件间传递和比较，但避免直接操作 | React 18   |
+| `useSyncExternalStore`                                       | 允许组件订阅外部数据源（如Redux store）并在数据变化时更新状态 | React 18   |
+
+
+
+### [**useMemo**](https://zh-hans.react.dev/reference/react/useMemo)
+
+> 详细参考文档：[useMemo – React 中文文档](https://zh-hans.react.dev/reference/react/useMemo)
+
+`useMemo` 是一个 React Hook，它在每次重新渲染的时候能够缓存计算的结果。
+
+```
+const cachedValue = useMemo(calculateValue, dependencies)
+```
+
+**参数** 
+
+- `calculateValue`：要缓存计算值的函数。
+  - 它应该是一个没有任何参数的纯函数，并且可以返回任意类型。
+  - React 将会在首次渲染时调用该函数；在之后的渲染中，如果 `dependencies` 没有发生变化，React 将直接返回相同值。
+  - 否则，将会再次调用 `calculateValue` 并返回最新结果，然后缓存该结果以便下次重复使用。
+- `dependencies`：
+  - 所有在 `calculateValue` 函数中使用的响应式变量组成的数组。
+  - 响应式变量包括 props、state 和所有你直接在组件中定义的变量和函数。
+
+**返回值** 
+
+* 在初次渲染时，`useMemo` 返回不带参数调用 `calculateValue` 的结果。
+* 在接下来的渲染中，如果依赖项没有发生改变，它将返回上次缓存的值；否则将再次调用 `calculateValue`，并返回最新结果。
+* **通过 [`Object.is`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/is) 比较所有依赖项是否发生变化**。
+
+
+
+| 部分       | 详细                 | 描述                                                         |
+| ---------- | -------------------- | ------------------------------------------------------------ |
+| 功能       |                      | `useMemo` 是一个 React Hook，用于在**每次重新渲染时缓存计算结果**。 |
+| 基本用法   |                      | 通过 `useMemo(calculateValue, dependencies)` 缓存计算结果，避免不必要的重新计算和组件重新渲染。 |
+| 原理       |                      | 通过 [`Object.is`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/is) 比较所有依赖项是否发生变化 |
+| 参数       |                      |                                                              |
+| -          | `calculateValue`     | 要缓存计算值的函数，是一个纯函数，无参数，返回任意类型。     |
+| -          | `dependencies`       | 包含 `calculateValue` 函数中使用的响应式变量数组。           |
+| 返回值     |                      | 初次渲染时返回 `calculateValue` 的结果，后续渲染中，依赖项不变则返回缓存值，否则重新计算并缓存新结果。 |
+| 注意事项   |                      |                                                              |
+| -          | 使用位置             | 只能在组件顶层或自定义 Hook 中调用。                         |
+| -          | 开发模式             | 严格模式下，计算函数可能被调用两次，以帮助发现错误。         |
+| -          | 缓存丢弃             | 特定情况下 React 可能会丢弃缓存值，例如组件初始挂载期间被终止。 |
+| 性能优化   |                      | 用于跳过代价昂贵的重新计算，提高组件性能。                   |
+| 衡量开销   |                      | 使用 `console.time` 和 `console.timeEnd` 来测量计算过程的开销。 |
+| 使用条件   |                      | 仅在计算明显慢且依赖关系很少改变时使用 `useMemo`。           |
+| 避免滥用   |                      | 遵循一定原则，避免不必要的记忆化，提高代码可读性。           |
+| 子组件优化 |                      | 使用 `useMemo` 帮助优化子组件的重新渲染性能。                |
+| 记忆化函数 |                      | 使用 `useMemo` 记忆化函数，但通常使用 `useCallback` 更为方便。 |
+| 故障排除   |                      |                                                              |
+| -          | 计算函数运行两次     | 开发环境下，React 会调用计算函数两次来帮助发现错误。         |
+| -          | 返回 `undefined`     | 确保正确使用对象字面量语法，避免返回 `undefined`。           |
+| -          | 每次渲染都重新计算   | 确保传递正确的依赖项数组给 `useMemo`。                       |
+| -          | 循环中调用 `useMemo` | 不要在循环中调用 `useMemo`，而是为每个列表项提取组件或使用 `memo`。 |
 
 ---
+
+
+
+### [useCallback](https://zh-hans.react.dev/reference/react/useCallback)
+
+`useCallback` 是一个允许你在多次渲染中**缓存函数**的 React Hook。
+
+```
+const cachedFn = useCallback(fn, dependencies)
+```
+
+**参数** 
+
+- `fn`：想要缓存的函数。
+  - 此函数可以接受任何参数并且返回任何值。
+  - 在初次渲染时，React 将把函数返回给你（而不是调用它！）。
+  - 当进行下一次渲染时，如果 `dependencies` 相比于上一次渲染时没有改变，那么 React 将会返回相同的函数。
+  - 否则，React 将返回在最新一次渲染中传入的函数，并且将其缓存以便之后使用。
+  - React 不会调用此函数，而是返回此函数。你可以自己决定何时调用以及是否调用。
+- `dependencies`：有关是否更新 `fn` 的所有响应式值的一个列表。
+  - 响应式值包括 props、state，和所有在你组件内部直接声明的变量和函数。
+  - 如果你的代码检查工具 [配置了 React](https://zh-hans.react.dev/learn/editor-setup#linting)，那么它将校验每一个正确指定为依赖的响应式值。
+  - 依赖列表必须具有确切数量的项，并且必须像 `[dep1, dep2, dep3]` 这样编写。
+  - **React 使用 [`Object.is`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/is) 比较每一个依赖和它的之前的值**。
+
+**返回值** 
+
+* 在初次渲染时，`useCallback` 返回你已经传入的 `fn` 函数
+* 在之后的渲染中, 如果依赖没有改变，`useCallback` 返回上一次渲染中缓存的 `fn` 函数；否则返回这一次渲染传入的 `fn`。
+
+**注意** 
+
+- `useCallback` 是一个 Hook，所以应该在 **组件的顶层** 或自定义 Hook 中调用。你不应在循环或者条件语句中调用它。如果你需要这样做，请新建一个组件，并将 state 移入其中。
+
+
+
+| 部分     | 详细                | 描述                                                         |
+| -------- | ------------------- | ------------------------------------------------------------ |
+| 功能     |                     | `useCallback` 是一个 React Hook，用于在多次渲染中**缓存函数**。 |
+| 基本用法 |                     | 通过 `useCallback(fn, dependencies)` 缓存函数，避免在组件重新渲染时不必要的函数重新创建。 |
+| 参数     |                     |                                                              |
+| -        | `fn`                | 需要缓存的函数，可以接收任何参数，返回任何值。               |
+| -        | `dependencies`      | 一个包含所有响应式值的列表，用于判断是否需要更新 `fn`。      |
+| 返回值   |                     | 初次渲染返回传入的 `fn` 函数，在后续渲染中，依赖未变则返回缓存的 `fn`，否则返回当前渲染的 `fn`。 |
+| 注意事项 |                     |                                                              |
+| -        | 使用位置            | 应在组件顶层或自定义 Hook 中调用，不在循环或条件语句中使用。 |
+| -        | 缓存机制            | React 不会在没有特定理由的情况下丢弃缓存的函数。             |
+| 用法     |                     |                                                              |
+| -        | 跳过组件的重新渲染  | 通过缓存传递给子组件的函数来优化渲染性能。                   |
+| -        | 更新 state          | 从记忆化回调中更新 state 时，尽量减少依赖项。                |
+| -        | 防止频繁触发 Effect | 通过缓存 Effect 中使用的函数，避免不必要的 Effect 触发。     |
+| -        | 优化自定义 Hook     | 自定义 Hook 返回的函数应使用 `useCallback` 进行包裹。        |
+| 疑难解答 |                     |                                                              |
+| -        | 返回不同函数        | 确保传递依赖数组给 `useCallback`。                           |
+| -        | 循环中使用          | 不要在循环中调用 `useCallback`，应提取组件或使用 `memo`。    |
+
+---
+
+
+
+### **useMemo VS useCallback**
+
+> 详细参考：[useCallback – React 中文文档](https://zh-hans.react.dev/reference/react/useCallback#how-is-usecallback-related-to-usememo)
+
+#### 相同点
+
+| 相同点           | 描述                                                         |
+| ---------------- | ------------------------------------------------------------ |
+| **Hooks 的使用** | 两者都是 React 的 Hook，用于优化组件性能。                   |
+| **缓存机制**     | 都利用了记忆化来避免不必要的计算或渲染。                     |
+| **依赖数组**     | 都接收一个依赖数组作为参数，以判断何时应该重新计算或更新。   |
+| **顶层调用**     | 推荐在组件或自定义 Hook 的顶层调用，避免在循环或条件语句中使用。 |
+
+#### 区别
+
+- **[`useMemo`](https://zh-hans.react.dev/reference/react/useMemo) 缓存函数调用的结果**。
+  - 在这里，它缓存了调用 `computeRequirements(product)` 的结果。
+  - 除非 依赖项 发生改变，否则它将不会发生变化。
+  - 这让你向下传递 计算结果 时而无需不必要地重新渲染 子组件。
+  - 必要时，React 将会调用传入的函数重新计算结果。
+- **`useCallback` 缓存函数本身**。
+  - 不像 `useMemo`，它不会调用你传入的函数。相反，它缓存此函数。
+  - 除非 依赖项 发生改变，缓存函数 自己将不会发生改变。
+  - 这让你向下传递 缓存 函数而无需不必要地重新渲染 子组件。
+
+| 区别             | `useMemo`                                                    | `useCallback`                                                |
+| ---------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| **目的**         | **缓存计算结果**                                             | **缓存函数本身**                                             |
+| **返回值**       | **返回计算函数的结果**                                       | **返回一个记忆化的函数**                                     |
+| **使用场景**     | 当你需要缓存一个计算过程的结果，且该计算过程在组件渲染中代价较大时使用 | 当你希望避免在每次渲染时都创建一个新的函数实例，特别是作为子组件的 props 传递时 |
+| **计算函数**     | 接受一个计算函数作为第一个参数，并在依赖项变化时重新执行该函数 | 不执行传入的函数，而是返回一个引用相等的函数                 |
+| **记忆化内容**   | 记忆化计算结果，如果依赖项不变，则返回上一次的计算结果       | 记忆化函数引用，如果依赖项不变，则返回相同的函数引用         |
+| **示例**         | `useMemo(() => expensiveCalculation(a, b), [a, b])`          | `useCallback(() => { doSomething(); }, [a, b])`              |
+| **开发模式行为** | 在严格模式下，计算函数可能会被执行两次以帮助发现副作用       | 函数本身不会被执行，只是返回一个函数引用                     |
+| **适用情况**     | 适用于计算结果的记忆化，例如数组过滤、对象转换等             | 适用于函数引用的记忆化，例如传递给子组件的回调函数           |
+| **避免滥用**     | 避免在所有地方使用，只有在计算成本高且依赖项稳定时使用       | 避免在所有地方使用，只有在函数引用需要稳定时使用             |
+
+
+
+
+
+----
 
 
 
