@@ -1325,6 +1325,92 @@ sendOneMillionEmailsOnly(); // 启动发送一百万封电子邮件的过程
 
 ## 异步题目
 
+### 实现一个带并发限制的异步调度器，保证同时最多运行2个任务
+
+**要求**：实现一个异步调度器，保证同时最多运行2个任务。
+
+#### 解答方法
+
+1. **定义 Scheduler 类**：创建一个 `Scheduler` 类，用于管理并发执行的异步任务。
+
+2. **维护任务队列**：使用两个数组，`unwork` 和 `working`，分别存储待执行的任务和正在执行的任务。
+
+3. **实现 add 方法**：`add` 方法接收一个异步任务，并返回一个新的 Promise。
+   * 当前正在执行的任务数量小于最大并发数，则立即执行该任务；
+   * 否则，将任务添加到待执行队列。
+
+4. **执行任务**：`runTask` 方法负责执行一个异步任务。当任务完成时，从正在执行的任务队列中移除该任务，并根据需要从待执行队列中获取下一个任务执行。
+
+5. **封装异步任务**：通过 `asyncTask.resolve` 确保异步任务完成后，外层 Promise 能够正确解决，并继续执行其他任务。
+
+6. **测试调度器**：创建多个异步任务，使用 `addTask` 函数添加到调度器，并观察执行结果。
+
+#### 代码实现
+
+```javascript
+class Scheduler {
+  constructor() {
+    this._max = 2; // 最大并发数
+    this.unwork = []; // 待执行任务队列
+    this.working = []; // 正在执行的任务队列
+  }
+
+  add(asyncTask) {
+    return new Promise((resolve) => {
+      asyncTask.resolve = resolve;
+      if (this.working.length < this._max) {
+        this.runTask(asyncTask);
+      } else {
+        this.unwork.push(asyncTask);
+      }
+    });
+  }
+
+  runTask(asyncTask) {
+    this.working.push(asyncTask);
+    asyncTask().then(() => {
+      asyncTask.resolve(); // 完成外层 Promise 的 resolve
+      const index = this.working.indexOf(asyncTask);
+      this.working.splice(index, 1); // 从正在执行的任务队列中删除
+      if (this.unwork.length > 0) {
+        this.runTask(this.unwork.shift()); // 执行下一个待执行任务
+      }
+    });
+  }
+}
+
+const timeout = (time) => new Promise(resolve => {
+  setTimeout(resolve, time);
+});
+
+const scheduler = new Scheduler();
+
+const addTask = (time, order) => {
+  scheduler
+    .add(() => timeout(time))
+    .then(() => console.log(order));
+};
+
+// 添加任务
+addTask(4000, 4);
+addTask(2000, 2);
+addTask(3000, 3);
+addTask(900, 1);
+```
+
+#### 预期输出
+
+```
+2
+4
+1
+3
+```
+
+这个输出结果表明任务是按照并发限制和任务完成时间顺序执行的。任务2和4最先开始执行，因为它们最先到达调度器并且调度器未满。任务1和3随后执行，因为它们的执行时间较短，能够在2和4完成之前结束。
+
+
+
 ### 异步API执行顺序
 
 * 题目一：以下代码输出结果
