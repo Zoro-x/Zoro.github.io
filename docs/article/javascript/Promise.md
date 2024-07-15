@@ -518,9 +518,9 @@ setTimeout
 
 ## Promise 特性
 
-### **Promise 特性问题**
 
- **如何取消一个Promise？**
+
+###  **如何取消一个Promise？**
 
 * 在要停止的`promise`链位置添加一个方法，返回一个永远不执行`resolve`或者`reject`的`Promise`，那么这个`promise`永远处于`pending`状态，所以永远也不会向下执行`then`或`catch`了。这样我们就停止了一个`promise`链
 
@@ -559,7 +559,7 @@ setTimeout
 * ![](../images/promise-test.png)
 * all会立即决议，决议结果是fullfilled，值是undefined; race会永远都不决议，程序卡死
 
-**Promise链上返回的最后一个Promise出错了怎么办？**
+### **Promise链上返回的最后一个Promise出错了怎么办？**
 
 * `catch`在`promise`链式调用的末尾调用，用于捕获链条中的错误信息，但是`catch`方法内部也可能出现错误，所以有些`promise`实现中增加了一个方法`done`，`done`相当于提供了一个不会出错的`catch`方法，并且不再返回一个`promise`，一般用来结束一个`promise`链
 
@@ -572,11 +572,217 @@ setTimeout
    }
   ```
 
-  
 
-### Promise 应用题
 
-* 题目一：**顺序加载10张图片，图片地址已知，但是同时最多加载3张图片，要求用`promise`实现**
+
+
+
+----
+
+
+
+## Promisec串行
+
+### 串行概念
+
+* 有多个任务，多个任务必须顺序执行（下一个任务依赖上一个任务结果）
+* 使用 Promise 进行异步操作的顺序处理
+* Promise 串行执行实现原理： 利用 Promise.then() 的链式调用
+
+### Pomise 串行实现
+
+模拟三个异步函数，每一个函数依赖上一个函数结果
+
+```javascript
+/ 异步函数 p1
+let p1 = function () {
+  return new Promise(function (resolve, reject) {
+    setTimeout(function () {
+      resolve('p1->')
+    }, 1000)
+  })
+}
+
+// 异步函数 p2
+let p2 = function (data) {
+  return new Promise(function (resolve, reject) {
+    resolve(data + 'p2->')
+  })
+}
+
+// 异步函数 p3
+let p3 = function (data) {
+  return new Promise(function (resolve, reject) {
+    setTimeout(function () {
+      resolve(data + 'p3->')
+    }, 500)
+  })
+}
+```
+
+
+
+#### **使用then链式操作**
+
+* 缺点：书写比较繁琐
+
+```javascript
+p1()
+  .then(function (data) {
+    return p2(data)
+  })
+  .then(function (data) {
+    return p3(data)
+  })
+  .then(function (data) {
+    console.log(data)
+  })
+// 输出: p1->p2->p3->
+```
+
+
+
+#### **forEach循环构建队列**
+
+```javascript
+function queue(arr) {
+  let sequence = Promise.resolve()
+  arr.forEach(function (item) {
+    sequence = sequence.then(item)
+  })
+  return sequence
+}
+
+// 执行队列
+queue([p1, p2, p3])
+  .then(data => {
+    console.log(data)
+  })
+// 输出: p1->p2->p3->
+```
+
+
+
+#### **reduce循环构建队列**
+
+```javascript
+function queue(arr) {
+  return arr.reduce(
+    (promiseChain, currentFunction) => promiseChain.then(currentFunction),
+    Promise.resolve()	//	将初始值使用 promise 包裹
+  );
+}
+
+// 执行队列
+queue([p1, p2, p3])
+  .then(data => {
+    console.log(data)
+  })
+// 输出: p1->p2->p3->
+```
+
+```javascript
+function queue(tasks) {
+    function recordValue(results, value) {
+        results.push(value);
+        return results;
+    }
+    var pushValue = recordValue.bind(null, []);
+    return tasks.reduce(function (promise, task) {
+        return promise.then(() => task).then(pushValue);
+    }, Promise.resolve());
+}
+
+
+// 执行队列
+queue([p1, p2, p3])
+  .then(data => {
+    console.log(data)
+  })
+```
+
+
+
+#### **使用async、await构建队列**
+
+写法一：使用 for of 循环
+
+```javascript
+async function queue(arr) {
+  let res = null
+  for (let promise of arr) {
+    res = await promise(res)
+  }
+  return await res
+}
+
+// 执行队列
+queue([p1, p2, p3])
+  .then(data => {
+    console.log(data)
+  })
+// 输出: p1->p2->p3->
+```
+
+写法二： 使用 for 循环
+
+```js
+let getSomething = function (param) {
+  return new Promise((reslove, reject) => {
+    setTimeout(() => {
+      reslove(`get ${param}`)
+    }, 1000);
+  })
+}
+
+let getAll = async function () {
+  for (let i = 0; i < 10; i++) {
+    let result = await getSomething(i)
+    console.log(result)
+  }
+}
+
+getAll()
+```
+
+
+
+#### **使用回调+队列串行执行**
+
+```js
+// operations defined elsewhere and ready to execute
+const operations = [
+  { func: function1, args: args1 },
+  { func: function2, args: args2 },
+  { func: function3, args: args3 },
+];
+
+function executeFunctionWithArgs(operation, callback) {
+  // executes function
+  const { args, func } = operation;
+  func(args, callback); // 传入参数并执行函数
+}
+
+function serialProcedure(operation) {
+  if (!operation) process.exit(0); // finished
+  executeFunctionWithArgs(operation, function (result) {
+    // continue AFTER callback
+    serialProcedure(operations.shift());//回调中执行下一个异步函数
+  });
+}
+
+serialProcedure(operations.shift());
+```
+
+
+
+
+
+
+
+### **顺序加载图片**
+
+**顺序加载10张图片，图片地址已知，但是同时最多加载3张图片，要求用`promise`实现**
 
 ```javascript
 const baseUrl = 'http://img.aizhifou.cn/';
@@ -653,157 +859,13 @@ startLoadImage(urls, 3)
 ```
 
 >将代码复制到chrome浏览器可以看到下面的运行结果：
->![1.png](../images/demo1.png)
+>![](../images/demo1.png)
 >可以看到，所有图片加载完成，在没有失败的情况下，打印出来`all`
 >解析：`Promise.race`方法接受的参数中有一个`promise`对象返回结果了就会立即触发成功或者失败的函数。这里利用这个特性，先将`promise`队列循环加入，直到达到限制，等待`race`，`race`后又加入一个`promise`，利用递归一直循环这个过程，到最后用`promise.all`捕获剩下的图片加载
 
 
 
-## Promisec串行
-
-### 串行概念
-
-* 有多个任务，多个任务必须顺序执行（下一个任务依赖上一个任务结果）
-* 使用 Promise 进行异步操作的顺序处理
-* Promise 串行执行实现原理： 利用 Promise.then() 的链式调用
-
-### Pomise 串行实现
-
-模拟三个异步函数，每一个函数依赖上一个函数结果
-
-```javascript
-/ 异步函数 p1
-let p1 = function () {
-  return new Promise(function (resolve, reject) {
-    setTimeout(function () {
-      resolve('p1->')
-    }, 1000)
-  })
-}
-
-// 异步函数 p2
-let p2 = function (data) {
-  return new Promise(function (resolve, reject) {
-    resolve(data + 'p2->')
-  })
-}
-
-// 异步函数 p3
-let p3 = function (data) {
-  return new Promise(function (resolve, reject) {
-    setTimeout(function () {
-      resolve(data + 'p3->')
-    }, 500)
-  })
-}
-```
-
-
-
-* 实现一：**使用then链式操作**
-
-  * 缺点：书写比较繁琐
-
-  ```javascript
-  p1()
-    .then(function (data) {
-      return p2(data)
-    })
-    .then(function (data) {
-      return p3(data)
-    })
-    .then(function (data) {
-      console.log(data)
-    })
-  // 输出: p1->p2->p3->
-  ```
-
-  
-
-* 实现二：**forEach循环构建队列**
-
-  ```javascript
-  function queue(arr) {
-    let sequence = Promise.resolve()
-    arr.forEach(function (item) {
-      sequence = sequence.then(item)
-    })
-    return sequence
-  }
-  
-  // 执行队列
-  queue([p1, p2, p3])
-    .then(data => {
-      console.log(data)
-    })
-  // 输出: p1->p2->p3->
-  ```
-
-  
-
-* 实现三：**reduce循环构建队列**
-
-  ```javascript
-  function queue(arr) {
-    return arr.reduce(
-      (promiseChain, currentFunction) => promiseChain.then(currentFunction),
-      Promise.resolve()	//	将初始值使用 promise 包裹
-    );
-  }
-  
-  // 执行队列
-  queue([p1, p2, p3])
-    .then(data => {
-      console.log(data)
-    })
-  // 输出: p1->p2->p3->
-  ```
-
-  ```javascript
-  function queue(tasks) {
-      function recordValue(results, value) {
-          results.push(value);
-          return results;
-      }
-      var pushValue = recordValue.bind(null, []);
-      return tasks.reduce(function (promise, task) {
-          return promise.then(() => task).then(pushValue);
-      }, Promise.resolve());
-  }
-  
-  
-  // 执行队列
-  queue([p1, p2, p3])
-    .then(data => {
-      console.log(data)
-    })
-  ```
-
-  
-
-* 实现四：**使用async、await构建队列**
-
-  ```javascript
-  async function queue(arr) {
-    let res = null
-    for (let promise of arr) {
-      res = await promise(res)
-    }
-    return await res
-  }
-  
-  // 执行队列
-  queue([p1, p2, p3])
-    .then(data => {
-      console.log(data)
-    })
-  // 输出: p1->p2->p3->
-  ```
-
-
-### 串行应用
-
-#### axios请求/响应拦截过程
+### axios请求/响应拦截过程
 
 * axios中请求/响应是过程是顺序执行 [请求拦截器, dispatchRequest, 响应拦截器]  队列的过程
 * 队列中请求拦截器， dispatchRequest，响应拦截器 为Promise 对象
@@ -886,7 +948,15 @@ console.log(promise)
 
 执行结果：![](../images/moni-axios.png)
 
-## Promise 并行
+
+
+----
+
+
+
+
+
+## Promise 并发控制
 
 * 并行：多个异步请求同时进行
 
@@ -902,305 +972,443 @@ console.log(promise)
 
 
 
-### 并发控制
-
-#### 并发概念
+### 并发概念
 
 ​	要求执行 n 个异步任务，但不能 n 个异步任务同时执行 (内存资源限制等原因)，需要控制每次 m ( m<n ) 个异步任务同时进行，但最终结果是执行 n 个异步任务
 
-#### 并发思想
+### 并发思想
 
-* 使用 Promise 并行执行 API : Promise.all()、Promise.allSettled()、Promise.race()、Promise.any() 并行执行异步，控制每次并行执行的 Promise 实例;
-* Promise 并发限制，其实根源上就是控制 Promise 的实例化个数；Promise 并不是因为调用 Promise.all 才执行，而是在实例化 Promise 对象的时候就执行了;
+* 使用 Promise 并行执行 API : `Promise.all()`、`Promise.allSettled()`、`Promise.race()`、`Promise.any()` 并行执行异步，控制每次并行执行的 Promise 实例;
+* Promise 并发限制，其实根源上就是控制 Promise 的实例化个数；
+* **Promise 并不是因为调用 Promise.all 才执行，而是在实例化 Promise 对象的时候就执行了;**
 * 要实现并发限制，只能从 Promise 实例化上下手，把生成 Promises 数组的控制权，交给并发控制逻辑
 
-#### 并发实现
-
-* 实现一： **使用 async await 和 Promise.all 封装并发任务 (推荐)**
-
-  * 思路：循环截取列表中 limit 个数据并发执行
-  * 缺点：
-    * 每次并发执行 limit 个，需要等待全部结果返回后，才能执行下一次并发
-
-  ```javascript
-  /**
-   * @params list {Array} - 要迭代的数组
-   * @params limit {Number} - 并发数量控制数
-   * @params asyncHandle {Function} - 对 list 的每一个项的异步处理函数，参数为当前处理项，必须 return 一个 Promise 来确定是否继续进行迭代 ( 异步处理 Promise 实例化必须在 asyncHandle 中完成 )
-   * @return {Promise} - 返回一个 Promise 值来确认所有数据是否迭代完成
-  **/
-  async function concurrencyLimit(list,limit,asyncHandler) {
-      for(let i = 0; i < list.length; i += limit) { 
-          let partiaList  = list.slice(i,i + limit); //遍历列表，每次截取 limit 个数据
-          console.log(`partiaList is ${partiaList}`)
-          await (()=> { //遍历截取的并发数据，使用 asyncHandler 包装异步操作，并返回 Promise 数组，并发执行
-              return Promise.all( partiaList.map( value => asyncHandler(value)) )
-          })();
-      }
-  }
-  
-  
-  //------------------------------------------测试demo---------------------------------------------
-  //模拟获取 10 个数据结果
-  let dataLists = Array.from({length: 10}, (v, i) => i); //生成 1-10的数组，待并发执行数据
-  let successfulData = [] //成功获取的数据
-  let errData = [] // 获取失败的数据
-  concurrencyLimit(dataLists, 3, (curItem)=>{ // 异步处理函数
-      return new Promise((resolve, reject) => {
-          setTimeout(()=>{
-              console.log(`return data is ${curItem}`) 
-              if(curItem %3 == 0) { // 如果数据是 3 的倍数，获取失败
-                  reject({
-                   	data: curItem,
-                  	status: 404 
-                  })
-              }
-              resolve({
-                  data: curItem,
-                  status: 200
-              });
-          }, Math.random() * 5000)  // 设置随机响应时间
-      }).then(res => {
-          successfulData.push(res) //获取成功数据保存进入数组
-      }).catch(err => {
-          console.log(`get fail: ${err.data}`) 
-          errData.push(err) //获取失败数据保存
-      });
-  })
-  ```
-
-  
-
-* 实现二：**Promise.all 并发执行并递归**
-
-  * 思路：使用 Promise 并发执行 limit 个异步操作，然后通过递归和 then 的链式调用形成 limit 条并发执行的执行链
-  * 缺点： 
-    * 最后只返回 limit 条链的最后执行的结果，不能记录每条执行链的执行顺序和所有结果
-    * 捕获的错误数据也会返回
-  * 使用递归，如果并发请求量大，会占用较大内存
-    * 不能按顺序发起请求
-
-  ```javascript
-  /**
-   * @params list {Array} - 要迭代的数组
-   * @params limit {Number} - 并发数量控制数
-   * @params asyncHandle {Function} - 对 list 的每一个项的异步处理函数，参数为当前处理项，必须 return 一个 Promise 来确定是否继续进行迭代 ( 异步处理 Promise 实例化必须在 asyncHandle 中完成 )
-   * @return {Promise} - 返回一个 Promise 值来确认所有数据是否迭代完成
-   */
-  const concurrencyLimit = (list, limit, asyncHandle) => {
-      let recursion = (tasks) => { //递归迭代数组，形成一条执行链
-          return asyncHandle(tasks.shift()) //获取队列头数据，并用异步处理函数处理，返回一个 Promise 实例
-              .then((res)=>{ // 返回异步处理结果 
-                  if (tasks.length > 0) {
-                      return recursion(tasks)   // 数组还未迭代完，递归继续进行迭代
-                  } else { //迭代完成，返回最终数据
-                      console.log('res is ',res)
-                      return res 
-                  }
-              }).catch(err => { //捕获错误
-              	console.log('err data is', err.data)
-              	if (tasks.length > 0) { //数组未迭代完成，继续迭代
-                      return recursion(tasks)   // 数组还未迭代完，递归继续进行迭代
-                  } else { //迭代完成，返回最终数据
-                      return err
-                  }
-          	})
-      };
-      
-      let listCopy = [].concat(list); // 拷贝需要处理的列表
-      let asyncList = []; // 正在进行的数量为 limit 个并发异步操作
-      while(limit--) { // 控制并发数量，通过 Promise.all 形成 limit 条并发执行的执行链
-          asyncList.push( recursion(listCopy) ); //实例化 limit 个 Promise 异步操作实例
-      }
-      return Promise.all(asyncList)
-      	.then( response => { // 返回 limit 条并发执行的执行链的最后一个执行结果
-          	console.log(`all data is `,response)
-      	})
-      	.catch(err => {
-          	console.log(`error: ${err}`)
-      	});  // 所有并发异步操作都完成后，本次并发控制迭代完成
-  }
-  
-  
-  //-------------测试demo--------------------
-  let dataLists = Array.from({length: 10}, (v, i) => i); //生成 1-10的数组
-  concurrencyLimit(dataLists, 3, (curItem)=>{
-      return new Promise((resolve,reject) => {
-          setTimeout(()=>{
-              console.log(`return data is ${curItem}`)
-              if(curItem % 4 == 0) { // 如果数据是 4 的倍数，获取失败
-              	reject({
-                   	data: curItem,
-                  	status: 404 
-                  })
-              }
-              resolve({
-                  data: curItem,
-                  status: 200
-              });
-          }, Math.random() * 5000)  
-      });
-  })
-  ```
-
-* 实现三：**使用递归和队列 (推荐)**
-
-  * 思路：将待请求数据存入数组，形成并发执行的异步操作队列，然后进行遍历，取出数组中每一项数据执行异步操作。进行调用控制并发数的同时，每结束一个请求并发起一个新的请求。使用递归的方式，添加一个请求队列，然后我们只要维护这个队列，每次发起一个请求就添加进去，结束一个就丢出来，继而实现了控制并发
-
-  ```javascript
-  /**
-   * @params list {Array} - 要迭代的任务数组
-   * @params limit {Number} - 并发数量控制数
-   * @params asyncHandle {Function} - 对 list 的每一个任务的异步处理函数，参数为当前处理项，必须 return 一个 Promise 来确定是否继续进行迭代 ( 异步处理 Promise 实例化必须在 asyncHandle 中完成 )
-   * @params callback {Function} - 所有异步操作结束后执行的回调
-   * @return {Promise} - 返回一个 Promise 值来确认所有数据是否迭代完成
-  **/
-  const concurrencyLimit = (list, limit, asyncHandle, callback) => {
-      const count = list.length; // 异步任务数量
-      const tasksQueue = []; //并发任务队列，每次执行一个任务就添加进去，结束一个就丢出来，继而实现了控制并发
-      const results = []; // 任务执行结果
-      let   tasksList = [].concat(list); // 拷贝需要处理的任务列表
-      
-      const resultHandle = (res) => { //结果处理函数，维护请求队列
-          console.log('current tasks queue is:',tasksQueue);
-          const resultNum = results.push(res); // 保存结果，并返回执行完成的异步任务数量
-          if(resultNum < count && tasksList.length > 0) { //返回结束任务数量和待处理任务列表不为空
-              tasksQueue.shift(); //任务队列中移除已经完成的异步任务
-              handleTask(tasksList.shift()) //从任务列表中添加一个任务进行处理
-          } else if(resultNum === count && tasksList.length === 0) { 
-              //任务列表任务处理完成并所有执行结果返回
-              'function' === typeof callback && callback(results)
-          } 
-      }
-      
-      const handleTask = (task) => { //任务处理方法，控制任务并发数量
-          let request = asyncHandle(task) //任务处理
-          	.then(res => {
-             		resultHandle(res); 
-         		}).catch(res => {
-  				resultHandle(res); 
-              });
-          
-          if(tasksQueue.push(request) < limit) { //并发执行任务数量小于限制数量,[].push 操作后返回当前数组长度
-              handleTask(tasksList.shift()); // 添加并发任务处理
-          }
-      }
-      
-      //将任务列表任务添加到任务处理方法
-      handleTask(tasksList.shift()); 
-  }
-  
-  //--------------------测试demo--------------------------------------
-  let dataLists = Array.from({length: 10}, (v, i) => i); //生成 1-10的数组
-  const callback = (results) => {
-    console.log('all tasks finished! results is:',results);
-  };
-  concurrencyLimit(dataLists, 3, (curItem)=>{
-      return new Promise((resolve,reject) => {
-          setTimeout(()=>{
-              console.log(`return data is ${curItem}`)
-               if(curItem % 3 == 0) { // 如果数据是 3 的倍数，获取失败
-              	reject({
-                   	data: curItem,
-                  	status: 404 
-                  })
-              }
-              resolve({
-                  data: curItem,
-                  status: 200
-              });
-          }, Math.random() * 5000)  
-      });
-  },callback)
-  ```
-
-  
-
-  
-
-#### 并发应用
-
-* 题目一：**网页中预加载20张图片资源，分步加载，一次加载10张，两次完成，怎么控制图片请求的并发，怎样感知当前异步请求是否已完成？**
-
-  答案参考 [Promise 异步流程控制](https://zhuanlan.zhihu.com/p/29792886)
 
 
+### 并发控制
 
+* 全并发：全部异步函数同时并发执行，不限制数据量
 
+* 有限并行：通过控制限制并发数量，实现并发请求
 
-## 异步循环
+### 有限并发实现
 
-> 异步循环：在循环中包含异步操作
+#### **使用 async await 和 Promise.all 封装并发任务 (推荐)**
 
-* 解决思路： promise + async wait: 使用promise封装异步操作，使用async await执行循环
+* 思路：循环截取列表中 limit 个数据并发执行
+* 缺点：
+  * 每次并发执行 limit 个，需要等待全部结果返回后，才能执行下一次并发
 
-  ```javascript
-  let getSomething = function (param) {
-    return new Promise((reslove, reject) => {
-      setTimeout(() => {
-        reslove(`get ${param}`)
-      }, 1000);
-    })
-  }
-  
-  let getAll = async function () {
-    for (let i = 0; i < 10; i++) {
-      let result = await getSomething(i)
-      console.log(result)
+```javascript
+/**
+ * @params list {Array} - 要迭代的数组
+ * @params limit {Number} - 并发数量控制数
+ * @params asyncHandle {Function} - 对 list 的每一个项的异步处理函数，参数为当前处理项，必须 return 一个 Promise 来确定是否继续进行迭代 ( 异步处理 Promise 实例化必须在 asyncHandle 中完成 )
+ * @return {Promise} - 返回一个 Promise 值来确认所有数据是否迭代完成
+**/
+async function concurrencyLimit(list,limit,asyncHandler) {
+    for(let i = 0; i < list.length; i += limit) { 
+        let partiaList  = list.slice(i,i + limit); //遍历列表，每次截取 limit 个数据
+        console.log(`partiaList is ${partiaList}`)
+        await (()=> { //遍历截取的并发数据，使用 asyncHandler 包装异步操作，并返回 Promise 数组，并发执行
+            return Promise.all( partiaList.map( value => asyncHandler(value)) )
+        })();
     }
-  }
-  
-  getAll()
-  ```
-
-
-
-## 异步串行
-
-> 异步方案有：
->
-> * 回调
-> * promise
-> * async await
-
-### 回调实现
-
-```js
-// operations defined elsewhere and ready to execute
-const operations = [
-  { func: function1, args: args1 },
-  { func: function2, args: args2 },
-  { func: function3, args: args3 },
-];
-
-function executeFunctionWithArgs(operation, callback) {
-  // executes function
-  const { args, func } = operation;
-  func(args, callback); // 传入参数并执行函数
 }
 
-function serialProcedure(operation) {
-  if (!operation) process.exit(0); // finished
-  executeFunctionWithArgs(operation, function (result) {
-    // continue AFTER callback
-    serialProcedure(operations.shift());//回调中执行下一个异步函数
-  });
-}
 
-serialProcedure(operations.shift());
-
+//------------------------------------------测试demo---------------------------------------------
+//模拟获取 10 个数据结果
+let dataLists = Array.from({length: 10}, (v, i) => i); //生成 1-10的数组，待并发执行数据
+let successfulData = [] //成功获取的数据
+let errData = [] // 获取失败的数据
+concurrencyLimit(dataLists, 3, (curItem)=>{ // 异步处理函数
+    return new Promise((resolve, reject) => {
+        setTimeout(()=>{
+            console.log(`return data is ${curItem}`) 
+            if(curItem %3 == 0) { // 如果数据是 3 的倍数，获取失败
+                reject({
+                 	data: curItem,
+                	status: 404 
+                })
+            }
+            resolve({
+                data: curItem,
+                status: 200
+            });
+        }, Math.random() * 5000)  // 设置随机响应时间
+    }).then(res => {
+        successfulData.push(res) //获取成功数据保存进入数组
+    }).catch(err => {
+        console.log(`get fail: ${err.data}`) 
+        errData.push(err) //获取失败数据保存
+    });
+})
 ```
 
 
 
-## 异步并行
+#### **使用递归和队列 (推荐)**
 
-### 全并行
+思路：
+
+1. 将待请求数据存入数组，形成并发执行的异步操作队列;
+2. 然后进行遍历，取出数组中每一项数据执行异步操作;
+3. 进行调用控制并发数的同时，每结束一个请求并发起一个新的请求。
+
+使用递归的方式，添加一个请求队列，然后我们只要维护这个队列，每次发起一个请求就添加进去，结束一个就丢出来，继而实现了控制并发
+
+```javascript
+/**
+ * @params list {Array} - 要迭代的任务数组
+ * @params limit {Number} - 并发数量控制数
+ * @params asyncHandle {Function} - 对 list 的每一个任务的异步处理函数，参数为当前处理项，必须 return 一个 Promise 来确定是否继续进行迭代 ( 异步处理 Promise 实例化必须在 asyncHandle 中完成 )
+ * @params callback {Function} - 所有异步操作结束后执行的回调
+ * @return {Promise} - 返回一个 Promise 值来确认所有数据是否迭代完成
+**/
+const concurrencyLimit = (list, limit, asyncHandle, callback) => {
+    const count = list.length; // 异步任务数量
+    const tasksQueue = []; //并发任务队列，每次执行一个任务就添加进去，结束一个就丢出来，继而实现了控制并发
+    const results = []; // 任务执行结果
+    let   tasksList = [].concat(list); // 拷贝需要处理的任务列表
+    
+    const resultHandle = (res) => { //结果处理函数，维护请求队列
+        console.log('current tasks queue is:',tasksQueue);
+        const resultNum = results.push(res); // 保存结果，并返回执行完成的异步任务数量
+        if(resultNum < count && tasksList.length > 0) { //返回结束任务数量和待处理任务列表不为空
+            tasksQueue.shift(); //任务队列中移除已经完成的异步任务
+            handleTask(tasksList.shift()) //从任务列表中添加一个任务进行处理
+        } else if(resultNum === count && tasksList.length === 0) { 
+            //任务列表任务处理完成并所有执行结果返回
+            'function' === typeof callback && callback(results)
+        } 
+    }
+    
+    const handleTask = (task) => { //任务处理方法，控制任务并发数量
+        let request = asyncHandle(task) //任务处理
+        	.then(res => {
+           		resultHandle(res); 
+       		}).catch(res => {
+				resultHandle(res); 
+            });
+        
+        if(tasksQueue.push(request) < limit) { //并发执行任务数量小于限制数量,[].push 操作后返回当前数组长度
+            handleTask(tasksList.shift()); // 添加并发任务处理
+        }
+    }
+    
+    //将任务列表任务添加到任务处理方法
+    handleTask(tasksList.shift()); 
+}
+
+//--------------------测试demo--------------------------------------
+let dataLists = Array.from({length: 10}, (v, i) => i); //生成 1-10的数组
+const callback = (results) => {
+  console.log('all tasks finished! results is:',results);
+};
+concurrencyLimit(dataLists, 3, (curItem)=>{
+    return new Promise((resolve,reject) => {
+        setTimeout(()=>{
+            console.log(`return data is ${curItem}`)
+             if(curItem % 3 == 0) { // 如果数据是 3 的倍数，获取失败
+            	reject({
+                 	data: curItem,
+                	status: 404 
+                })
+            }
+            resolve({
+                data: curItem,
+                status: 200
+            });
+        }, Math.random() * 5000)  
+    });
+},callback)
+```
+
+
+
+
+
+#### **Promise.all 并发执行并递归**
+
+* 思路：使用 Promise 并发执行 limit 个异步操作，然后通过递归和 then 的链式调用形成 limit 条并发执行的执行链
+* 缺点： 
+  * 最后只返回 limit 条链的最后执行的结果，不能记录每条执行链的执行顺序和所有结果
+  * 捕获的错误数据也会返回
+  * 使用递归，如果并发请求量大，会占用较大内存
+  * 不能按顺序发起请求
+
+```javascript
+/**
+ * @params list {Array} - 要迭代的数组
+ * @params limit {Number} - 并发数量控制数
+ * @params asyncHandle {Function} - 对 list 的每一个项的异步处理函数，参数为当前处理项，必须 return 一个 Promise 来确定是否继续进行迭代 ( 异步处理 Promise 实例化必须在 asyncHandle 中完成 )
+ * @return {Promise} - 返回一个 Promise 值来确认所有数据是否迭代完成
+ */
+const concurrencyLimit = (list, limit, asyncHandle) => {
+    let recursion = (tasks) => { //递归迭代数组，形成一条执行链
+        return asyncHandle(tasks.shift()) //获取队列头数据，并用异步处理函数处理，返回一个 Promise 实例
+            .then((res)=>{ // 返回异步处理结果 
+                if (tasks.length > 0) {
+                    return recursion(tasks)   // 数组还未迭代完，递归继续进行迭代
+                } else { //迭代完成，返回最终数据
+                    console.log('res is ',res)
+                    return res 
+                }
+            }).catch(err => { //捕获错误
+            	console.log('err data is', err.data)
+            	if (tasks.length > 0) { //数组未迭代完成，继续迭代
+                    return recursion(tasks)   // 数组还未迭代完，递归继续进行迭代
+                } else { //迭代完成，返回最终数据
+                    return err
+                }
+        	})
+    };
+    
+    let listCopy = [].concat(list); // 拷贝需要处理的列表
+    let asyncList = []; // 正在进行的数量为 limit 个并发异步操作
+    while(limit--) { // 控制并发数量，通过 Promise.all 形成 limit 条并发执行的执行链
+        asyncList.push( recursion(listCopy) ); //实例化 limit 个 Promise 异步操作实例
+    }
+    return Promise.all(asyncList)
+    	.then( response => { // 返回 limit 条并发执行的执行链的最后一个执行结果
+        	console.log(`all data is `,response)
+    	})
+    	.catch(err => {
+        	console.log(`error: ${err}`)
+    	});  // 所有并发异步操作都完成后，本次并发控制迭代完成
+}
+
+
+//-------------测试demo--------------------
+let dataLists = Array.from({length: 10}, (v, i) => i); //生成 1-10的数组
+concurrencyLimit(dataLists, 3, (curItem)=>{
+    return new Promise((resolve,reject) => {
+        setTimeout(()=>{
+            console.log(`return data is ${curItem}`)
+            if(curItem % 4 == 0) { // 如果数据是 4 的倍数，获取失败
+            	reject({
+                 	data: curItem,
+                	status: 404 
+                })
+            }
+            resolve({
+                data: curItem,
+                status: 200
+            });
+        }, Math.random() * 5000)  
+    });
+})
+```
+
+
+
+
+
+
+
+
+
+### 并发应用
+
+### 预加载20**张图片**
+
+> 题目一：**网页中预加载20张图片资源，分步加载，一次加载10张，两次完成，怎么控制图片请求的并发，怎样感知当前异步请求是否已完成？**
+>
+> 答案参考 [Promise 异步流程控制](https://zhuanlan.zhihu.com/p/29792886)
+
+第一步，将加载图片封装成 Promise 异步控制方式：
+
+```js
+function loadImg (url) {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.onload = function () {
+      resolve(img)
+    }
+    img.onerror = reject
+    // 给 img 对象添加 scr，开始加载图片
+    img.src = url
+  })
+}
+```
+
+
+
+#### **单一请求，多个 Promise 串行同步化**
+
+* 将所有图片串行加载，从第一张开始到最后一张按顺序加载并输出：
+
+```js
+// 同步加载图片
+function syncLoad (fn, arr, handler) {
+  if (typeof fn !== 'function') throw TypeError('第一个参数必须是function')
+  if (!Array.isArray(arr)) throw TypeError('第二个参数必须是数组')
+  handler = typeof fn === 'function' ? handler : function () {}
+  const errors = []
+  // 从第一张图片开始同步加载
+  return load(0)
+    
+  // 串行同步加载图片
+  function load (index) {
+    // 加载图片下标大于 图片列表长度，退出加载
+    if (index >= arr.length) {
+      return errors.length > 0 ? Promise.reject(errors) : Promise.resolve()
+    }
+    // 串行加载
+    return fn(arr[index]) // 执行传入回调
+      .then(data => {
+        // 处理结果
+        handler(data)
+      })
+      .catch(err => {
+        console.log(err)
+        // 记录错误结果
+        errors.push(arr[index])
+        // 继续加载下一张图片
+        return load(index + 1)
+      })
+      .then(() => {
+        // 继续加载下一张图片
+        return load (index + 1)
+      })
+  }
+}
+
+// 调用
+syncLoad(loadImg, urls, addToHtml)
+  .then(() => {
+    // 所有图片加载完成，删除 loading
+    document.querySelector('.loading').style.display = 'none'
+  })
+  .catch(console.log)
+```
+
+
+
+
+
+#### **一次性并发请求**
+
+* 同一域名下能够并发多个 HTTP 请求，对于这种不需要按顺序加载，只需要按顺序来处理的并发请求，Promise.all 是最好的解决办法。
+* 使用 `Promise.all` 一次性并发执行加载所有图片。
+
+```js
+const promises = urls.map(loadImg)
+Promise.all(promises)
+  .then(imgs => {
+    imgs.forEach(addToHtml)
+    document.querySelector('.loading').style.display = 'none'
+  })
+  .catch(err => {
+    console.error(err, 'Promise.all 当其中一个出现错误，就会reject。')
+  })
+```
+
+
+
+#### **并发数量控制**
+
+1. 为了控制并发数量，我们需要增加一个队列保存并发执行的Promise，再增加一个 count 计数正在并发执行的 Promise 数量；
+2. 开始时，往队列中添加 limit （假设并发数量为 limit）个的 load 请求；
+3. 在 load 请求中维护并发队列：
+   * 当 count === limit 数量时候，开发请求；
+   * 当 load 中完成一次请求，count 数量减 1，并将下一个请求加入请求队列；
+4. 开始并发请求 limit 个请求。
+
+```js
+/** 有限并发控制
+* url: 图片 url
+* handler: 请求处理回调
+* limit: 并发限制数量
+**/
+function limitLoad (urls, handler, limit) {
+  const sequence = [].concat(urls) // 对数组做一个拷贝，图片列表
+  let count = 0 // 当前正在并发数量
+  const promises = [] // 并发队列
+
+  // 串行请求图片，并维护并发队列中的数量，当完成一个请求时，从并发队列去除一个请求，并将新的请求加入队列
+  const load = function () {
+    // 队列长度小于0 或 正在并发数量大于等于并发限制数量，退出
+    if (sequence.length <= 0 || count > limit) return
+    // 正在并发数量加 1
+    count += 1
+    console.log(`当前并发数: ${count}`)
+    //从图片列表取出一张图片，执行回调，然后进行请求
+    return handler(sequence.shift())
+      .catch(err => {
+        console.error(err)
+      })
+      .then(() => {
+        // 请求完成后，并发计数减1，将新的请求加入并发队列
+        count -= 1
+        console.log(`当前并发数：${count}`)
+      })
+      .then(() => load())
+  }
+  // 遍历列表，取出 limit 个请求进行并发请求
+  for(let i = 0; i < limit && i < sequence.length; i++){
+    promises.push(load())
+  }
+  // 并发请求 Limit 个请求
+  return Promise.all(promises)
+}
+```
+
+
+
+#### **使用 Promise.race 并发控制**
+
+```js
+function limitLoad (urls, handler, limit) {
+  const sequence = [].concat(urls) // 对数组做一个拷贝
+  let count = 0
+  let promises
+  const wrapHandler = function (url) {
+    const promise = handler(url).then(img => {
+      return { img, index: promise }
+    })
+    return promise
+  }
+  //并发请求到最大数
+  promises = sequence.splice(0, limit).map(url => {
+    return wrapHandler(url)
+  })
+  // limit 大于全部图片数, 并发全部请求
+  if (sequence.length <= 0) { 
+    return Promise.all(promises)
+  }
+  return sequence.reduce((last, url) => {
+    return last.then(() => {
+      return Promise.race(promises)
+    }).catch(err => {
+      console.error(err)
+    }).then((res) => {
+      let pos = promises.findIndex(item => {
+        return item == res.index
+      })
+      promises.splice(pos, 1)
+      promises.push(wrapHandler(url))
+    })
+  }, Promise.resolve()).then(() => {
+    return Promise.all(promises)
+  })
+}
+```
+
+
+
+---
+
+
+
+### **并发发送邮件**
+
+> 题目：实现通过电子邮件发送 1,000,000 个电子邮件收件人的列表。
+
+#### 全并发
 
 * 全并行：全部异步函数同时并发执行，不限制数据量
-* 题目：实现通过电子邮件发送 1,000,000 个电子邮件收件人的列表。
-
-#### 回调实现
 
 ```js
 let count = 0;
@@ -1259,11 +1467,9 @@ recipients.forEach(function (recipient) {
 
 
 
-### 有限并行
+#### **有限并行**
 
 * 优先并行：通过控制限制并发数量，实现并发请求
-
-#### 回调实现
 
 ```js
 let successCount = 0; // 记录成功发送的邮件数量
@@ -1323,7 +1529,11 @@ sendOneMillionEmailsOnly(); // 启动发送一百万封电子邮件的过程
 
 
 
-## 异步题目
+---
+
+
+
+
 
 ### 实现一个带并发限制的异步调度器，保证同时最多运行2个任务
 
@@ -1408,135 +1618,6 @@ addTask(900, 1);
 ```
 
 这个输出结果表明任务是按照并发限制和任务完成时间顺序执行的。任务2和4最先开始执行，因为它们最先到达调度器并且调度器未满。任务1和3随后执行，因为它们的执行时间较短，能够在2和4完成之前结束。
-
-
-
-### 异步API执行顺序
-
-* 题目一：以下代码输出结果
-
-  ```js
-  async function async1() {
-   console.log('async1 start')
-   await async2()
-   console.log('async1 end')
-  }
-  
-  async function async2() {
-   console.log('async2')
-  }
-  
-  console.log('script start')
-  
-  setTimeout(function () {
-   console.log('setTimeout0')
-  }, 0)
-  
-  setTimeout(function () {
-   console.log('setTimeout2')
-  }, 300)
-  
-  setImmediate(() => console.log('setImmediate'))
-  
-  process.nextTick(() => console.log('nextTick1'))
-  
-  async1()
-  
-  process.nextTick(() => console.log('nextTick2'))
-  
-  new Promise(function (resolve) {
-   console.log('promise1')
-   resolve();
-   console.log('promise2')
-  }).then(function () {
-   console.log('promise3')
-  })
-  
-  console.log('script end')
-  ```
-
-  * 结果：
-
-    ```js
-    script start
-    async1 start
-    async2
-    promise1
-    promise2
-    script end
-    nextTick1
-    nextTick2
-    async1 end
-    promise3
-    setTimeout0
-    setImmediate
-    setTimeout2
-    ```
-
-  * 分析：
-
-    > 1. 首先，代码从顶部开始执行，**输出`script start`。**
-    > 2. 接下来，`async1()`函数被调用，**输出`async1 start`。**
-    > 3. 在`async1()`函数内部，遇到了`await async2()`语句。由于`async2()`函数是一个异步函数，所以它会返回一个Promise并暂停`async1()`函数的执行（async await 后面的函数被放入微任务列队）。
-    > 4. 此时，JavaScript引擎继续执行后面的代码。**输出`async2`**，这是由于`async2()`函数被调用。
-    > 5. 紧接着，**输出`promise1`**，这是因为`new Promise`的回调函数立即执行。
-    > 6. 继续执行，**输出`promise2`**，然后调用`resolve()`。
-    > 7. Promise的`resolve()`方法并不会立即执行`then`方法中的回调函数，而是将其放入事件队列中，等待当前执行栈为空后执行。
-    > 8. 继续执行主任务，**输出`script end`**。
-    > 9. **输出`nextTick1`**，这是由于`process.nextTick()`方法的回调函数会在当前执行栈执行完成后立即执行。
-    > 10. **输出`nextTick2`**，这是因为在上一个`nextTick`回调函数之后，又调用了`process.nextTick()`方法。
-    > 11. 回到`async1()`函数，**输出`async1 end`**。
-    > 12. 然后，`promise.then()`中的回调函数被放入事件队列中，等待当前执行栈为空后执行。
-    > 13. **输出`promise3`**，这是因为`then`方法中的回调函数在上一步骤中被调用。
-    > 14. `setTimeout0`回调函数被放入事件队列中，等待至少达到设定的延迟时间（0ms）后执行，**输出`setTimeout0`**。
-    > 15. `setImmediate`回调函数被放入事件队列中，等待当前执行栈为空后执行，**输出`setImmediate`**。
-    > 16. `setTimeout2`回调函数被放入事件队列中，等待至少达到设定的延迟时间（300ms）后执行，**输出`setTimeout2`**。
-    >
-    > 最后，根据事件循环机制和各个定时器的规则，事件循环会按照一定的顺序处理事件队列中的回调函数。因此，`setImmediate`回调函数会在`setTimeout`回调函数之前执行，而`setTimeout0`回调函数会在`setTimeout2`回调函数之前执行。
-
-### setTimeout 与 setImmediate 输出顺序
-
-* 以下代码输出结果为：
-
-  ```js
-  setTimeout(() => {
-      console.log("setTimeout");
-  }, 0);
-  setImmediate(() => {
-      console.log("setImmediate");
-  });
-  ```
-
-  * 结果：
-
-    ```js
-    情况一：
-    setTimeout
-    setImmediate
-    情况二：
-    setImmediate
-    setTimeout
-    ```
-
-  * 分析：
-
-    > ● 外层同步代码一次性全部执行完，遇到异步API就塞到对应的阶段
-    >
-    > ● 遇到setTimeout,虽然设置的是0毫秒触发，但实际上会被强制改成1ms,时间到了然后塞入times阶段
-    >
-    > ● 遇到setImmediate塞入check 阶段
-    >
-    > ● 同步代码执行完毕，进入Event Loop
-    >
-    > ● 先进入times阶段，检查当前时间过去了1毫秒没有，如果过了1毫秒，满足setTimeout条件，执行回调，如果没过1毫秒，跳过
-    >
-    > ● 跳过空的阶段，进入check阶段，执行setImmediate回调
-    >
-    > 这里的关键在于这1ms,如果同步代码执行时间较长，进入Event Loop的时候1毫秒已经过了，setTimeout先执行，如果1毫秒还没到，就先执行了setImmediate
-
-
-
-
 
 
 

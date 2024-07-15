@@ -96,7 +96,7 @@ Vue SSR 框架为同构框架，应用代码编译过程 Vue SSR 提供了两个
 
 Vue SSR（Server-Side Rendering，服务器端渲染）的渲染流程主要涉及到服务器端和客户端的交互，以及Vue组件的渲染和激活过程。
 
-### 1. 通用代码和 Webpack 配置
+### **1. 通用代码和 Webpack 配置**
 
 #### **SSR 应用包含主要源码**
 
@@ -125,27 +125,30 @@ Vue SSR（Server-Side Rendering，服务器端渲染）的渲染流程主要涉�
 
 使用 Node Express 启动一个 HTTP 服务，响应 HTTP 请求。
 
-### 3. 服务器端渲染
+### **3. 服务器端渲染**
 
 #### **渲染过程**
 
 **Node Express 接收到 HTTP 请求以后，执行服务端渲染：**
 
 1. **创建Vue实例**：在服务器端，根据路由请求创建对应的Vue实例。这个实例包含了要渲染的组件及其数据。
-2. **渲染Vue实例为HTML字符串**：使用 `vue-server-renderer` 的 `renderToString `方法将Vue实例渲染成HTML字符串。这个过程中，Vue会遍历组件树，生成对应的HTML结构。
+2. **渲染Vue实例为HTML字符串**：**使用 `vue-server-renderer` 的 `renderToString `方法将Vue实例渲染成HTML字符串**。这个过程中，Vue会遍历组件树，生成对应的HTML结构。
+   * 渲染器有 `renderToString`或`renderToStream`方法，将Vue实例渲染为HTML字符串。
+   * `renderToString`会立即返回渲染好的HTML
+   * `renderToStream`会返回一个流，允许将HTML逐步发送给客户端，适用于较大的应用或需要优化性能的场景。
 3. **将HTML字符串注入到模板中**：将渲染出的HTML字符串注入到HTML模板中。这个模板通常包含了一些静态的HTML结构和一些占位符（如`<!--vue-ssr-outlet-->`），用于插入Vue渲染的内容。
 4. **将 HTML 数据注入全局变量**： 服务端通过将客户端数据注入到 `window.__INITIAL_STATE__` 变量中；
 5. **发送渲染后的HTML到客户端**：将包含Vue渲染内容的完整HTML页面发送给客户端浏览器。
 
 
 
-#### **服务端渲染特性**
-
-* 服务器端渲染中**为每个请求创建一个新的根 Vue 实例**，每个请求都是全新的、独立的应用程序实例，以便不会有交叉请求造成的状态污染；
-* 将数据进行响应式的过程在服务器上是多余的，所以默认情况下禁用；
-* 所有的生命周期钩子函数中，只有 `beforeCreate` 和 `created` 会在服务器端渲染 (SSR) 过程中被调用；
-  * 应该避免在 `beforeCreate` 和 `created` 生命周期时产生全局副作用的代码，例如在其中使用 `setInterval` 设置 timer。由于服务端渲染代码在 SSR 期间并不会调用销毁钩子函数，所以 timer 将永远保留下来。
-  * 为了避免这种情况，请将副作用代码移动到 `beforeMount` 或 `mounted` 生命周期中。
+> **服务端渲染特性**
+>
+> * 服务器端渲染中**为每个请求创建一个新的根 Vue 实例**，每个请求都是全新的、独立的应用程序实例，以便不会有交叉请求造成的状态污染；
+> * 将数据进行响应式的过程在服务器上是多余的，所以默认情况下禁用；
+> * 所有的生命周期钩子函数中，只有 `beforeCreate` 和 `created` 会在服务器端渲染 (SSR) 过程中被调用；
+>   * 应该避免在 `beforeCreate` 和 `created` 生命周期时产生全局副作用的代码，例如在其中使用 `setInterval` 设置 timer。由于服务端渲染代码在 SSR 期间并不会调用销毁钩子函数，所以 timer 将永远保留下来。
+>   * 为了避免这种情况，请将副作用代码移动到 `beforeMount` 或 `mounted` 生命周期中。
 
 
 
@@ -153,18 +156,24 @@ Vue SSR（Server-Side Rendering，服务器端渲染）的渲染流程主要涉�
 
 #### **激活过程**
 
-1. **客户端接收HTML**：客户端浏览器接收到服务器发送的HTML页面，并开始解析。
+1. **客户端接收HTML**：
+   * 客户端浏览器接收到服务器发送的HTML页面，并开始解析。
+   * 当浏览器接收到服务器返回的HTML后，会立即显示内容，该 HTML  页面包含爬虫需要的内容。
 2. **加载客户端bundle**：在HTML页面中，会包含对客户端bundle的引用（通常是通过`<script>`标签）。浏览器会加载并执行这个bundle。
-3. **激活静态内容**：客户端bundle中的代码会查找并激活HTML页面中的静态Vue内容。这个过程通常涉及到将Vue组件挂载到DOM上，并使其变为可交互的。
+3. **激活静态内容**：
+   * 客户端bundle中的代码会查找并激活HTML页面中的静态Vue内容。
+   * 这个过程通常涉及到将Vue组件挂载到DOM上，并使其变为可交互的。
 4. **获取 `window.__INITIAL_STATE__` 状态，注入到store 中**；（`window.__INITIAL_STATE__` 是通过服务端渲染预先获取的数据，并注入在 HTML 页面中的 `window.__INITIAL_STATE__`  变量中）；
-5. **后续路由和组件渲染**：一旦Vue实例被激活，后续的路由和组件渲染就可以像传统的SPA（单页应用程序）一样在客户端进行。
+5. **后续路由和组件渲染**：
+   * hydration完成后，Vue应用进入客户端接管模式，后续的任何状态变化都将在客户端进行局部更新，而不是重新从服务器获取整个页面。
+   * 一旦Vue实例被激活，后续的路由和组件渲染就可以像传统的SPA（单页应用程序）一样在客户端进行。
 
 
 
-#### **客户端渲染特性**
-
-* 任何生命周期钩子函数中的代码（例如 `beforeMount` 或 `mounted`），都会在客户端执行。
-* 对于仅浏览器可用的 API，通常方式是，在「纯客户端 (client-only)」的生命周期钩子函数中惰性访问 (lazily access) 它们。
+> **客户端渲染特性**
+>
+> * 任何生命周期钩子函数中的代码（例如 `beforeMount` 或 `mounted`），都会在客户端执行。
+> * 对于仅浏览器可用的 API，通常方式是，在「纯客户端 (client-only)」的生命周期钩子函数中惰性访问 (lazily access) 它们。
 
 
 
@@ -1159,6 +1168,85 @@ module.exports = function setupDevServer(app, templatePath, cb) {
 这个包为 Vue 2.0提供了 Node.js 服务器端渲染。完整代码可以参考 [src/platforms/web/entry-server-renderer.js](https://github.com/vuejs/vue/blob/dev/src/platforms/web/entry-server-renderer.js).
 
 在 `server.js` 服务端中，使用 `vue-server-renderer` 创建一个服务器端Vue组件渲染器 `renderer`，在收到客户端请求时，通过 `renderer.renderToString` 方法将页面渲染成静态 HTML 页面。
+
+
+
+
+
+### `renderToString` 方法渲染 HTML 过程
+
+`vue-server-renderer` 包中的 `renderToString` 方法是 Vue SSR（Server-Side Rendering，服务器端渲染）流程中的核心函数之一，它负责将 Vue 实例及其组件树转换成 HTML 字符串。
+
+这个过程涉及多个步骤包括:
+
+1. **组件的虚拟 DOM 转换**
+2. **模板编译（如果尚未编译）**
+3. **遍历虚拟 DOM**: 通过 parse 方法转换成 AST 。
+4. **处理指令和特殊属性**
+5. **进行静态标记**： 通过 optimize 进行静态标记。
+6. **生成 HTML 字符串**： 最后通过 generate 生成渲染函数，使用渲染函数渲染  HTML 字符串。
+
+这个过程提高了首屏加载速度和 SEO 性能，并为后续的客户端激活做好了准备。
+
+以下是 `renderToString` 方法渲染 HTML 的详细原理和过程：
+
+#### **1. 组件树构建**
+
+在调用 `renderToString` 方法之前，你已经在服务器端创建了一个 Vue 实例。
+
+这个实例包含了应用的根组件，以及可能通过 Vue Router 或其他方式定义的子组件。Vue 实例会基于这些数据构建出组件树（或称为组件的虚拟 DOM 树）。
+
+#### **2. 模板编译（如果尚未编译）**
+
+Vue 组件通常包含模板，这些模板在开发时是作为字符串提供的。
+
+在浏览器环境中，Vue 会使用运行时编译器将这些模板字符串编译成渲染函数。
+
+然而，在服务器端渲染的上下文中，通常推荐使用预编译的渲染函数（即，通过 Vue Loader 或其他构建工具在构建过程中将模板编译成 JavaScript 渲染函数）。
+
+如果组件的模板尚未编译（这在实际应用中很少见，因为通常会进行预编译），`vue-server-renderer` 可能会（取决于具体实现和配置）在内部进行编译，但这会增加渲染时间，因此通常不推荐。
+
+#### **3. 虚拟 DOM 转换**
+
+一旦组件树构建完成，**并且所有模板都已编译成渲染函数**，Vue 就开始将这些渲染函数应用到虚拟 DOM 上。
+
+虚拟 DOM 是一个轻量级的 JavaScript 对象，它表示了真实的 DOM 结构。
+
+Vue 使用虚拟 DOM 来高效地更新真实 DOM，但在 SSR 的上下文中，它主要用于生成最终的 HTML 字符串。
+
+#### **4. 渲染过程**
+
+`renderToString` 方法启动渲染过程。
+
+这个过程遍历虚拟 DOM 树，并根据组件的渲染函数和当前的状态（如 props、data、computed 属性等）生成相应的 HTML 字符串。
+
+在遍历过程中，如果遇到子组件，会递归地调用这些子组件的渲染函数，并将生成的 HTML 字符串拼接起来。
+
+#### **5. 指令和特殊属性处理**
+
+Vue 模板中的指令（如 `v-if`、`v-for`）和特殊属性（如 `v-model`）在渲染过程中会被特殊处理。
+
+例如，`v-if` 指令会决定是否渲染某个元素，而 `v-for` 指令会重复渲染某个元素多次。
+
+这些处理都发生在虚拟 DOM 到 HTML 字符串的转换过程中。
+
+#### **6. 静态标记**
+
+为了提高客户端激活（hydration）的性能，Vue SSR 会对生成的 HTML 进行静态标记。
+
+这意味着 Vue 会在服务器端渲染时识别出哪些 DOM 元素是静态的（即，它们的内容在客户端不会改变），并在这些元素上添加特殊的标记（如 `server-rendered` 属性或注释）
+
+。这样，在客户端激活时，Vue 可以跳过这些静态元素的重新渲染，从而提高性能。
+
+#### **7. 字符串输出**
+
+最后，`renderToString` 方法将生成的 HTML 字符串作为结果返回。
+
+这个字符串包含了整个 Vue 应用在服务器端渲染后的 HTML 内容，可以直接发送给客户端浏览器进行显示。
+
+
+
+
 
 
 
