@@ -111,34 +111,34 @@ tag:
 
 ## 常用命令/操作
 
-|      命令       | 描述                                 | 示例用法                                                     |
-| :-------------: | :----------------------------------- | :----------------------------------------------------------- |
-|      `ls`       | 列出目录内容                         | `ls -l` (长格式列出)                                         |
-|      `cd`       | 切换目录                             | `cd /home/user` (切换到/home/user目录)                       |
-|      `pwd`      | 显示当前工作目录                     | `pwd`                                                        |
-|      `cp`       | 复制文件或目录                       | `cp source.txt destination.txt` (复制文件)                   |
-|      `mv`       | 移动或重命名文件或目录               | `mv oldname.txt newname.txt` (重命名文件)                    |
-|      `rm`       | 删除文件或目录                       | `rm -r directory` (递归删除目录)                             |
-|     `mkdir`     | 创建目录                             | `mkdir newdir` (创建新目录)                                  |
-|     `rmdir`     | 删除空目录                           | `rmdir emptydir` (删除空目录)                                |
-|     `touch`     | 创建空文件或更新文件时间戳           | `touch newfile.txt` (创建新文件)                             |
-|      `cat`      | 显示文件内容                         | `cat file.txt`                                               |
-|     `echo`      | 输出文本或变量值                     | `echo "Hello, World!"`                                       |
-|     `grep`      | 在文件中搜索指定模式                 | `grep "pattern" file.txt`                                    |
-|     `find`      | 在目录树中查找文件                   | `find /home -name "*.txt"` (在/home中查找所有.txt文件)       |
-|     `chmod`     | 改变文件或目录的权限                 | `chmod 755 file.txt` (设置文件权限为755)                     |
-|     `chown`     | 改变文件或目录的所有者和所属组       | `chown user:group file.txt` (更改文件的所有者和所属组)       |
-|      `df`       | 显示磁盘空间使用情况                 | `df -h` (以人类可读的格式显示)                               |
-|      `du`       | 显示目录或文件的磁盘使用情况         | `du -sh directory` (显示目录的总磁盘使用情况)                |
-|      `ps`       | 显示进程状态                         | `ps -ef` (显示所有进程信息)                                  |
-|     `kill`      | 终止进程                             | `kill PID` (终止指定PID的进程)                               |
-|      `top`      | 显示系统进程和状态                   | `top`                                                        |
-|   `ifconfig`    | 显示或配置网络接口信息               | `ifconfig eth0` (显示eth0接口信息)                           |
-|    `netstat`    | 显示网络连接、路由表、接口统计等信息 | `netstat -tuln` (显示TCP/UDP监听端口)                        |
-|     `ping`      | 测试网络连接                         | `ping google.com` (测试到google.com的连接)                   |
-|      `ssh`      | 安全地远程登录到其他计算机           | `ssh user@remotehost` (远程登录到remotehost)                 |
-|      `scp`      | 跨主机安全地复制文件                 | `scp source.txt user@remotehost:/path/to/destination` (复制文件到远程主机) |
-|      `tar`      | 打包或解包文件                       | `tar -czvf archive.tar.gz directory` (打包目录为tar.gz文件)  |
+| 命令            | 描述                                 | 示例用法                                                     |
+| :-------------- | :----------------------------------- | :----------------------------------------------------------- |
+| `ls`            | 列出目录内容                         | `ls -l` (长格式列出)，`ls -ld 目录` 显示文件信息(包括权限)   |
+| `cd`            | 切换目录                             | `cd /home/user` (切换到/home/user目录)                       |
+| `pwd`           | 显示当前工作目录                     | `pwd`                                                        |
+| `cp`            | 复制文件或目录                       | `cp source.txt destination.txt` (复制文件)                   |
+| `mv`            | 移动或重命名文件或目录               | `mv oldname.txt newname.txt` (重命名文件)                    |
+| `rm`            | 删除文件或目录                       | `rm -r directory` (递归删除目录)                             |
+| `mkdir`         | 创建目录                             | `mkdir newdir` (创建新目录)                                  |
+| `rmdir`         | 删除空目录                           | `rmdir emptydir` (删除空目录)                                |
+| `touch`         | 创建空文件或更新文件时间戳           | `touch newfile.txt` (创建新文件)                             |
+| `cat`           | 显示文件内容                         | `cat file.txt`                                               |
+| `echo`          | 输出文本或变量值                     | `echo "Hello, World!"`                                       |
+| `grep`          | 在文件中搜索指定模式                 | `grep "pattern" file.txt`                                    |
+| `find`          | 在目录树中查找文件                   | `find /home -name "*.txt"` (在/home中查找所有.txt文件)       |
+| `chmod`         | 改变文件或目录的权限                 | `chmod 755 file.txt` (设置文件权限为755)                     |
+| `chown`         | 改变文件或目录的所有者和所属组       | `chown user:group file.txt` (更改文件的所有者和所属组)       |
+| `df`            | 显示磁盘空间使用情况                 | `df -h` (以人类可读的格式显示)                               |
+| `du`            | 显示目录或文件的磁盘使用情况         | `du -sh directory` (显示目录的总磁盘使用情况)                |
+| `ps`            | 显示进程状态                         | `ps -ef` (显示所有进程信息)                                  |
+| `kill`          | 终止进程                             | `kill PID` (终止指定PID的进程)                               |
+| `top`           | 显示系统进程和状态                   | `top`                                                        |
+| `ifconfig`      | 显示或配置网络接口信息               | `ifconfig eth0` (显示eth0接口信息)                           |
+| `netstat`       | 显示网络连接、路由表、接口统计等信息 | `netstat -tuln` (显示TCP/UDP监听端口)                        |
+| `ping`          | 测试网络连接                         | `ping google.com` (测试到google.com的连接)                   |
+| `ssh`           | 安全地远程登录到其他计算机           | `ssh user@remotehost` (远程登录到remotehost)                 |
+| `scp`           | 跨主机安全地复制文件                 | `scp source.txt user@remotehost:/path/to/destination` (复制文件到远程主机) |
+| `tar`           | 打包或解包文件                       | `tar -czvf archive.tar.gz directory` (打包目录为tar.gz文件)  |
 | `gzip`/`gunzip` | 压缩或解压缩文件                     | `gzip file.txt` (压缩文件)                                   |
 
 ### 查看和编辑文件

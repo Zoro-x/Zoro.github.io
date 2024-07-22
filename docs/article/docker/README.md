@@ -71,6 +71,64 @@ Docker是一种开源的应用容器引擎，旨在简化应用程序的开发�
 
 
 
+## 进入 docker 镜像执行
+
+以查看 docker nginx 镜像，并修改 nginx 配置为例：
+
+1. 要进入 Docker 容器并查看 Nginx 镜像的配置，你首先需要确定 Nginx 容器正在运行，并且你知道它的容器 ID 或名称。
+2. 然后，你可以使用 `docker exec` 命令来在容器内运行一个 shell（通常是 bash 或 sh），这样你就可以查看或编辑 Nginx 的配置文件了。
+
+以下是一系列步骤，说明如何进入 Nginx 容器并查看其配置：
+
+1. **查找 Nginx 容器的 ID 或名称**：
+
+   使用 `docker ps` 命令列出所有正在运行的容器。这将显示容器的 ID、名称、创建的镜像等信息。找到你的 Nginx 容器的 ID 或名称。
+
+   ```bash
+   docker ps
+   ```
+
+   如果你知道容器名称（例如 `my_nginx_container`），你可以直接使用它；如果不知道，但你知道它是最近启动的，你可以使用 `docker ps` 输出的第一个 ID（通常是最新的容器）。
+
+2. **进入 Nginx 容器**：
+
+   使用 `docker exec` 命令加上 `-it` 选项来启动一个交互式终端会话。`-it` 选项中的 `-i` 保持 STDIN 开放，即使没有附加任何东西，`-t` 分配一个伪终端。然后，指定容器 ID 或名称，以及你想要在容器内部运行的命令（在这种情况下，是 `/bin/bash` 或 `/bin/sh`，取决于容器内可用的 shell）。
+
+   ```bash
+   docker exec -it <container_id_or_name> /bin/bash
+   ```
+
+   或者，如果 `/bin/bash` 不可用，尝试 `/bin/sh`：
+
+   ```bash
+   docker exec -it <container_id_or_name> /bin/sh
+   ```
+
+   将 `<container_id_or_name>` 替换为你的 Nginx 容器的 ID 或名称。
+
+3. **查看 Nginx 配置文件**：
+
+   一旦你在容器内部，你可以使用 `cat`、`less` 或 `more` 等命令来查看 Nginx 的配置文件。Nginx 的主配置文件通常位于 `/etc/nginx/nginx.conf`，但也可能包含在其他文件中，这些文件通过 `include` 指令在主配置文件中被引用。
+
+   查看主配置文件：
+
+   ```bash
+   cat /etc/nginx/nginx.conf
+   ```
+
+   或者，如果你想要查看被主配置文件包含的其他配置文件（如站点特定的配置文件），你可以浏览 `/etc/nginx/conf.d/` 或 `/etc/nginx/sites-available/` 目录（具体取决于你的 Nginx 镜像或配置）：
+
+   ```bash
+   ls /etc/nginx/conf.d/  
+   cat /etc/nginx/conf.d/default.conf
+   ```
+
+   请注意，根据你的 Nginx 镜像和配置，目录和文件名可能会有所不同。
+
+完成以上步骤后，你应该能够查看 Nginx 容器的配置文件了。如果你想要修改配置文件并持久化这些更改，你可能需要考虑使用 Docker 容器卷（volumes）来存储配置文件，而不是直接在容器内部修改它们。
+
+
+
 ## Docker 实践
 
 [使用 docker 部署 Node 服务 | Sewen 博客 (sewar-x.github.io)](https://sewar-x.github.io/myblog/article/node/使用docker服务node部署.html)
