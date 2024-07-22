@@ -212,7 +212,7 @@ services:
 
    如下图所示：显示有本地 8083 -> 容器80 端口的 nginx 容器，表示创建成功。
 
-   ![](D:\MyData\Blog\docs\article\images\image-20240719164044188.png)
+   ![](../images/image-20240719164044188.png)
 
 
 
