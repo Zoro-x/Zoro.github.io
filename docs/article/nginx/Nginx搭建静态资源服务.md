@@ -1,4 +1,8 @@
-# 使用 Nginx 搭建静态资源服务
+# Nginx 搭建静态资源服务
+
+## Nginx静态文件服务概述
+
+Nginx可以直接从文件系统中读取静态文件（如HTML、CSS、JavaScript、图片等）并返回给客户端，而不需要经过复杂的处理流程。这使得Nginx在处理静态文件时非常高效，适用于需要快速响应的Web应用。
 
 ## 环境准备
 
@@ -312,3 +316,77 @@ services:
 ### 4.使用 ftp 上传文件
 
 完成以上操作后，使用 ftp 工具登录你的账号和密码，上传文件到 rdm 目录中
+
+
+
+Nginx作为一款开源的高性能HTTP和反向代理服务器，具有轻量级设计、高并发能力、内存占用低以及配置简单等特点，非常适合用于提供静态文件服务。以下是对Nginx静态文件服务的详细说明：
+
+
+
+## Nginx静态文件服务配置
+
+###  基本配置
+
+在Nginx的配置文件中（通常是`nginx.conf`或包含在`sites-available`目录下的配置文件），可以通过`server`块来配置静态文件服务。以下是一个基本的配置示例：
+
+```nginx
+server {  
+    listen 80;             # 监听80端口  
+    server_name example.com; # 服务器名称  
+    root /usr/share/nginx/html; # 指定站点的根目录  
+    index index.html index.htm; # 定义默认的首页文件  
+  
+    location / {  
+        try_files $uri $uri/ =404; # 尝试按顺序匹配文件路径，找不到则返回404错误  
+    }  
+}
+```
+
+在这个配置中，Nginx会监听80端口，并将所有请求转发到`/usr/share/nginx/html`目录下查找相应的文件。如果请求的是目录，Nginx会尝试在该目录下查找`index.html`或`index.htm`作为默认页面。
+
+### 特定文件类型的配置
+
+可以为特定的文件类型配置不同的处理方式。例如，为图像文件设置单独的目录或启用Gzip压缩以减少传输数据量：
+
+```nginx
+location /images/ {  
+    root /data; # 将/images/路径映射到/data目录  
+}  
+  
+http {  
+    gzip on;  
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;  
+    gzip_min_length 256;  
+    gzip_comp_level 5;  
+    # ... 其他gzip配置  
+}
+```
+
+### 缓存设置
+
+为静态文件设置缓存头可以减少重复请求，提高性能。例如，为常见的静态文件类型设置30天的缓存时间：
+
+```nginx
+location ~* \.(jpg|jpeg|png|gif|ico|css|js)$ {  
+    expires 30d;  
+    add_header Cache-Control "public, no-transform";  
+}
+```
+
+### 高效文件传输
+
+Nginx提供了`sendfile`指令，可以直接从文件系统读取文件并发送给客户端，提高文件传输效率：
+
+```nginx
+http {  
+    sendfile on;  
+    tcp_nopush on;  
+    tcp_nodelay on;  
+    # ... 其他http配置  
+}
+```
+
+
+
+
+
