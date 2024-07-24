@@ -187,18 +187,20 @@ docker pull nginx:latest
 
 ```shell
 # 定义版本
-version: '3'
-services:
-  nginx: # 定义 nginx 服务
-    image: nginx:latest # 指定镜像
-    container_name: rdm-nginx # 指定容器名称
-    restart: always 
-    ports:
-      - "8083:80"  # 指定操作系统 8083 端口映射到容器 80 端口
-    volumes: # 指定映射文件
-      - /data/rdm:/data/rdm # 将nginx 容器 /data/rdm 目录挂载到 容器主机 /data/rdm 目录
-      - /data/nginx/logs:/var/log/nginx # 将nginx /data/nginx/logs 目录挂载到主机:/var/log/nginx 目录
-      - /data/nginx/conf/conf.d/rdm.conf:/etc/nginx/conf.d/default.conf # 将nginx 配置表 /etc/nginx/conf.d/default.conf 映射到主机: /data/nginx/conf/conf.d/rdm.conf 文件
+ version: '3'
+ services:
+   nginx: # 定义 nginx 服务
+     image: nginx:latest # 指定镜像
+     container_name: rdm-nginx # 指定容器名称
+     restart: always
+     ports:
+       - "8083:80"  # 指定操作系统 8083 端口映射到容器 80 端口
+     volumes: # 指定映射文件
+       - /data/rdm:/data/rdm # 将nginx 容器 /data/rdm 目录挂载到 容器主机 /data/rdm 目录
+       - /data/rdm-new:/data/rdm-new
+       - /data/rdm-old:/data/rdm-old
+       - /data/nginx/logs:/var/log/nginx
+       - /data/nginx/conf/conf.d/rdm.conf:/etc/nginx/conf.d/default.conf # 将nginx 配置表 /etc/nginx/conf.d/default.conf 映射到主机: /data/nginx/conf/conf.d/rdm.conf 文件
 ```
 
 4. 使用 docker-compose.yml 文件 创建 nginx 容器：（在 /data/rdm 目录下执行以下命令）
