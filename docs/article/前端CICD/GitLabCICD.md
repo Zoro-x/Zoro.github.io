@@ -87,8 +87,24 @@ GitLab CI/CD（持续集成/持续部署）的工作流程：
 
 
 
+
+
+## GitLab Runner
+
+
+
+
+
+
+
+
+
+
+
 **参考资料**
 
 [CI/CD系列 | 一步上手Gitlab CI/CD - 掘金 (juejin.cn)](https://juejin.cn/post/7135282389076934687)
 
 [CI/CD 系列 | 一文让你掌握 Gitlab Runner - 掘金 (juejin.cn)](https://juejin.cn/post/7134644436192985095)
+
+[YAML 语言教程 - 阮一峰的网络日志 (ruanyifeng.com)](https://ruanyifeng.com/blog/2016/07/yaml.html)

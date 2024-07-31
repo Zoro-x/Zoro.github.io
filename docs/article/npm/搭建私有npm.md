@@ -573,3 +573,72 @@ npm publish --registry http://registry.npmjs.org
 1. 请求后端一起分析可能情况，后端给出可能是集团网络策略限制问题，如果是网络策略问题，需要向集团申请开通入网申请；
 2. 请求集团网络管理员协助，询问是否有网络策略限制，网络管理员回复为入网策略限制原因，需要单独申请开通入网策略；
 
+
+
+### 在项目中保存 npm 仓库镜像账号密码，使得在执行 npm publish 时不需要登录
+
+在项目中保存 npm 仓库镜像账号密码，以便在执行 `npm publish` 时不需要登录，可以通过以下几种方式实现：
+
+#### 1. 使用 `.npmrc` 文件保存认证信息
+
+##### 方法一：直接保存加密后的 token
+
+1. 创建或获取 Token：
+
+   - 登录 npm 官网（[npmjs.com](https://www.npmjs.com/)），在用户设置中找到 Token 管理页面，创建一个新的 Token。注意，根据需要选择适当的权限范围，例如 Automation 类型的 Token 可以用于自动化流程中。
+   - Token 创建后，会生成一个加密字符串，这个字符串需要在后续步骤中使用。
+
+2. 编辑 `.npmrc` 文件：
+
+   - 在项目根目录下（或全局配置中，位于用户目录下的 .npmrc），添加或修改以下内容：
+
+     ```
+     //registry.npmjs.org/:_authToken=your_encrypted_token
+     ```
+
+   - 将 `your_encrypted_token` 替换为步骤 1 中获取的加密 Token。
+
+3. （可选）使用环境变量：
+
+   - 如果不希望将 Token 直接写在 .npmrc文件中，可以使用环境变量来替代。在 .npmrc 文件中使用
+
+     ```
+     ${VARIABLE_NAME}
+     ```
+
+     来引用环境变量，例如：
+
+     ```
+     //registry.npmjs.org/:_authToken=${NPM_TOKEN}
+     ```
+
+   - 然后在系统环境变量中设置 `NPM_TOKEN` 为你的 Token 值。
+
+##### 方法二：使用 base64 加密的用户名和密码
+
+1. 加密用户名和密码：
+
+   - 将用户名和密码以 `用户名:密码` 的格式拼接，然后使用 Base64 加密。可以使用在线工具（如 [bejson.com](https://www.bejson.com/enc/base64/)）进行加密。
+
+2. 编辑 `.npmrc` 文件：
+
+   - 在.npmrc文件中添加以下配置（假设你正在使用私有 npm 镜像）：
+
+     ```
+     registry=https://your.private.registry.url/  
+     _auth=your_base64_encoded_string
+     ```
+
+   - 将 `your.private.registry.url` 替换为你的私有 npm 镜像 URL，将 `your_base64_encoded_string` 替换为步骤 1 中得到的 Base64 加密字符串。
+
+#### 2. 使用 npm login 或 npm adduser（不推荐）
+
+虽然这些方法可以登录 npm，但它们并不直接解决在执行 `npm publish` 时不需要登录的问题。通常，这些命令用于手动登录，并且会在 `.npmrc` 文件中生成 `_authToken` 或其他认证信息。然而，为了自动化流程，建议使用 Token 或环境变量的方式。
+
+#### 3. 注意事项
+
+- **安全性**：确保 Token 或加密信息的安全，不要将它们泄露给不应该访问它们的人。
+- **版本控制**：如果你将 `.npmrc` 文件加入到了版本控制系统中（如 Git），请确保不会意外地提交包含敏感信息的 `.npmrc` 文件。一种做法是在版本控制系统中忽略 `.npmrc` 文件，并在构建或部署环境中单独配置它。
+- **兼容性**：不同版本的 npm 和 npm 镜像可能有不同的配置要求，请确保你的配置与你的环境和 npm 版本兼容。
+
+通过上述方法，你可以在项目中保存 npm 仓库镜像的账号密码，以便在执行 `npm publish` 时不需要手动登录。

@@ -23,7 +23,20 @@ export default hopeTheme({
         blog: true,
         prismjs: true,
         search: true,
+        watermark:true,
         mdEnhance: {
+             // 你想使用的组件
+            components: [
+                "Badge",
+                "CodePen",
+                "PDF",
+                "Share",
+                "SiteInfo",
+                "StackBlitz",
+                "VPBanner",
+                "VPCard",
+                "XiGua",
+            ],
             // 启用下角标功能
             sub: false,
             // 启用上角标
@@ -98,8 +111,14 @@ export default hopeTheme({
     },
     markdown: {
         headers: {
-            level: [2, 6]
-        }
+            level: [4, 5]
+        },
+        toc: {
+            level: [4, 5]
+        },
+        anchor: {
+            level: [4, 5]
+        },
     },
     repo: 'https://github.com/Sewar-x',
     // 自定义仓库链接文字。默认从 `repo` 中自动推断为
