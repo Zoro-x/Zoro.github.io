@@ -1,8 +1,11 @@
-export default [ // 导航栏配置
-    { text: '首页', link: '/' },
+import { navbar } from "vuepress-theme-hope";
+
+export default navbar([ // 导航栏配置
+    { text: '首页',icon:'house', link: '/' },
 
     {
         text: '前端与计算机基础',
+        icon: "computer",
         children: [
             {
                 text: '前端基础',
@@ -28,10 +31,12 @@ export default [ // 导航栏配置
 
     {
         text: '框架与源码分析',
+        icon:'code',
         ariaLabel: '框架和源码分析',
         children: [
             {
                 text: 'Vue 专题',
+                icon: 'vuejs',
                 ariaLabel: 'Vue 专题',
                 children: [
                     { text: 'Vue2 原理和源码分析', link: '/article/vue2/Vue2原理和源码分析.md' },
@@ -47,6 +52,7 @@ export default [ // 导航栏配置
             },
             {
                 text: 'React 专题',
+                icon: 'react',
                 ariaLabel: 'React 专题',
                 children: [
                     { text: 'React 基础', link: '/article/React/React基础.md' },
@@ -60,6 +66,7 @@ export default [ // 导航栏配置
             },
             {
                 text: 'WebPack 专题',
+                icon: 'cube',
                 ariaLabel: 'WebPack 专题',
                 children: [
                     { text: 'webpack 基础', link: '/article/webpack/webpack基础.md' },
@@ -85,6 +92,7 @@ export default [ // 导航栏配置
 
     {
         text: '浏览器与服务器',
+        icon: 'windows',
         ariaLabel: '浏览器',
         children: [
             {
@@ -115,6 +123,7 @@ export default [ // 导航栏配置
 
     {
         text: '前端工程与项目实践',
+        icon: 'hammer',
         ariaLabel: '项目实践',
         children: [
             {
@@ -183,6 +192,7 @@ export default [ // 导航栏配置
     },
     {
         text: 'SSR/SSG',
+        icon: 'google',
         ariaLabel: 'SSR/SSG/SEO',
         children: [
             { text: '前端渲染架构', link: '/article/前端工程化/前端渲染架构.md' },
@@ -194,6 +204,7 @@ export default [ // 导航栏配置
     },
     {
         text: '移动端与性能优化',
+        icon: 'mobile-screen',
         ariaLabel: '浏览器和性能优化',
         children: [
             {
@@ -217,6 +228,7 @@ export default [ // 导航栏配置
 
     {
         text: '微前端',
+        icon: 'layer-group',
         ariaLabel: '微前端',
         children: [
             { text: '微前端基础', link: '/article/微前端/微前端基础.md' },
@@ -226,4 +238,4 @@ export default [ // 导航栏配置
             { text: '从零到一搭建微前端项目模板', link: '/article/微前端/从零到一搭建微前端项目模板.md' },
         ]
     }
-]
+])

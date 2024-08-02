@@ -126,8 +126,7 @@ export default hopeTheme({
     repoLabel: "GitHub",
     // 是否在导航栏内显示仓库链接，默认为 `true`
     repoDisplay: true,
-    // iconAssets: "//at.alicdn.com/t/c/font_4498493_4q0qio6tw97.css"
-    iconAssets: "fontawesome",
+    iconAssets: "fontawesome-with-brands",
     print: true,
     fullscreen: true,
 });
