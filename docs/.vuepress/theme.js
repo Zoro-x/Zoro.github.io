@@ -41,47 +41,47 @@ export default hopeTheme({
             sub: false,
             // 启用上角标
             sup: false,
-            tasklist: true,
+            tasklist: false,
             // 启用 figure
-            figure: true,
+            figure: false,
             // 启用图片懒加载
             imgLazyload: true,
             // 启用图片标记
             imgMark: true,
             // 启用图片大小
-            imgSize: true,
+            imgSize: false,
             //启用 导入文件：https://theme-hope.vuejs.press/zh/guide/markdown/content/include.html#%E9%85%8D%E7%BD%AE
-            include: true,
+            include: false,
             // 启用 幻灯片：https://theme-hope.vuejs.press/zh/guide/markdown/content/revealjs.html
-            revealJs: true,
+            revealJs: false,
             //脚注: https://theme-hope.vuejs.press/zh/guide/markdown/content/footnote.html
             footnote: true,
             //选项卡：https://theme-hope.vuejs.press/zh/guide/markdown/content/tabs.html
-            tabs: true,
+            tabs: false,
             // 启用 GFM 警告：https://theme-hope.vuejs.press/zh/guide/markdown/stylize/alert.html#%E6%BC%94%E7%A4%BA
-            alert: true,
+            alert: false,
             // 属性支持: https://theme-hope.vuejs.press/zh/guide/markdown/stylize/attrs.html#%E9%85%8D%E7%BD%AE
-            attrs: true,
+            attrs: false,
             // 提示容器:https://theme-hope.vuejs.press/zh/guide/markdown/stylize/hint.html#%E6%BC%94%E7%A4%BA
-            hint: true,
+            hint: false,
             //标记: 使用 == == 进行标记。请注意两边需要有空格。
-            mark: true,
+            mark: false,
             //对齐方式
             align: false,
             //Chart.js: https://theme-hope.vuejs.press/zh/guide/markdown/chart/chartjs.html
             chart: false,
             //启用 echart: https://theme-hope.vuejs.press/zh/guide/markdown/chart/echarts.html
-            echarts: true,
+            echarts: false,
             //Mermaid: https://theme-hope.vuejs.press/zh/guide/markdown/chart/mermaid.html
-            mermaid: true,
+            mermaid: false,
             //思维导图：https://theme-hope.vuejs.press/zh/guide/markdown/chart/markmap.html#settings
-            markmap: true,
+            markmap: false,
             //流程图：https://theme-hope.vuejs.press/zh/guide/markdown/chart/flowchart.html#%E9%85%8D%E7%BD%AE
-            flowchart: true,
+            flowchart: false,
             //Vue 交互演示: https://theme-hope.vuejs.press/zh/guide/markdown/code/vue-playground.html
-            vuePlayground: true,
+            vuePlayground: false,
             //代码块分组: https://theme-hope.vuejs.press/zh/guide/markdown/code/code-tabs.html
-            codetabs: true,
+            codetabs: false,
             // !代码演示: https://theme-hope.vuejs.press/zh/guide/markdown/code/demo.html
             demo: true
         },
