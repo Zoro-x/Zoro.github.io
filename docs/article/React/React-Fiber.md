@@ -5,7 +5,7 @@ sticky: true
 category:
   - React
 tag:
-  - Fiber
+  - React Fiber
 ---
 
 # React Fiber
