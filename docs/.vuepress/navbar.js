@@ -5,7 +5,7 @@ export default navbar([ // 导航栏配置
 
     {
         text: '前端与计算机基础',
-        icon: "computer",
+        icon: 'thumbtack',
         children: [
             {
                 text: '前端基础',
@@ -36,7 +36,6 @@ export default navbar([ // 导航栏配置
         children: [
             {
                 text: 'Vue 专题',
-                icon: 'vuejs',
                 ariaLabel: 'Vue 专题',
                 children: [
                     { text: 'Vue2 原理和源码分析', link: '/article/vue2/Vue2原理和源码分析.md' },
@@ -92,7 +91,7 @@ export default navbar([ // 导航栏配置
 
     {
         text: '浏览器与服务器',
-        icon: 'windows',
+        icon: 'computer',
         ariaLabel: '浏览器',
         children: [
             {
@@ -190,18 +189,7 @@ export default navbar([ // 导航栏配置
             },
         ]
     },
-    {
-        text: 'SSR/SSG',
-        icon: 'google',
-        ariaLabel: 'SSR/SSG/SEO',
-        children: [
-            { text: '前端渲染架构', link: '/article/前端工程化/前端渲染架构.md' },
-            { text: 'VueSSR原理分析', link: '/article/vue2/VueSSR原理分析.md' },
-            { text: '从零到一搭建SSR项目', link: '/article/项目总结/从零到一搭建SSR项目.md' },
-            { text: '从零到一搭建移动端SSG项目', link: '/article/移动端/从零到一搭建移动端SSG项目.md' },
-            { text: '移动端SSG项目实践', link: '/article/移动端/移动端SSG项目实践.md' },
-        ]
-    },
+
     {
         text: '移动端与性能优化',
         icon: 'mobile-screen',
@@ -237,5 +225,17 @@ export default navbar([ // 导航栏配置
             { text: '使用微前端重构项目', link: '/article/微前端/使用微前端重构项目.md' },
             { text: '从零到一搭建微前端项目模板', link: '/article/微前端/从零到一搭建微前端项目模板.md' },
         ]
-    }
+    },
+    {
+        text: 'SSR/SSG',
+        icon: 'bolt',
+        ariaLabel: 'SSR/SSG/SEO',
+        children: [
+            { text: '前端渲染架构', link: '/article/前端工程化/前端渲染架构.md' },
+            { text: 'VueSSR原理分析', link: '/article/vue2/VueSSR原理分析.md' },
+            { text: '从零到一搭建SSR项目', link: '/article/项目总结/从零到一搭建SSR项目.md' },
+            { text: '从零到一搭建移动端SSG项目', link: '/article/移动端/从零到一搭建移动端SSG项目.md' },
+            { text: '移动端SSG项目实践', link: '/article/移动端/移动端SSG项目实践.md' },
+        ]
+    },
 ])

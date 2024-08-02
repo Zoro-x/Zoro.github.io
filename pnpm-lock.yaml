@@ -22,7 +22,7 @@ importers:
         version: 1.3.1(@algolia/client-search@4.24.0)(@types/node@22.0.2)(lightningcss@1.25.1)(postcss@8.4.40)(qrcode@1.5.3)(sass@1.77.8)(search-insights@2.15.0)(terser@5.31.3)
       vuepress-theme-hope:
         specifier: 2.0.0-rc.52
-        version: 2.0.0-rc.52(@vue/repl@4.3.1)(@vuepress/plugin-search@2.0.0-rc.40(vuepress@2.0.0-rc.14(@vuepress/bundler-webpack@2.0.0-rc.14)(vue@3.4.35)))(@waline/client@3.3.0)(chart.js@4.4.3)(flowchart.ts@3.0.0)(katex@0.16.11)(markdown-it@14.1.0)(markmap-lib@0.16.1(markmap-common@0.17.0))(markmap-toolbar@0.16.0(markmap-common@0.17.0))(markmap-view@0.16.0(markmap-common@0.17.0))(mermaid@10.9.1)(reveal.js@5.1.0)(sass-loader@14.2.1(sass@1.77.8)(webpack@5.93.0))(vuepress@2.0.0-rc.14(@vuepress/bundler-webpack@2.0.0-rc.14)(vue@3.4.35))
+        version: 2.0.0-rc.52(@vue/repl@4.3.1)(@vuepress/plugin-prismjs@2.0.0-rc.40(vuepress@2.0.0-rc.14(@vuepress/bundler-webpack@2.0.0-rc.14)(vue@3.4.35)))(@vuepress/plugin-search@2.0.0-rc.40(vuepress@2.0.0-rc.14(@vuepress/bundler-webpack@2.0.0-rc.14)(vue@3.4.35)))(@waline/client@3.3.0)(chart.js@4.4.3)(echarts@5.5.1)(flowchart.ts@3.0.0)(katex@0.16.11)(markdown-it@14.1.0)(markmap-lib@0.16.1(markmap-common@0.17.0))(markmap-toolbar@0.16.0(markmap-common@0.17.0))(markmap-view@0.16.0(markmap-common@0.17.0))(mermaid@10.9.1)(reveal.js@5.1.0)(sass-loader@14.2.1(sass@1.77.8)(webpack@5.93.0))(vuepress@2.0.0-rc.14(@vuepress/bundler-webpack@2.0.0-rc.14)(vue@3.4.35))
     devDependencies:
       '@vue/repl':
         specifier: ^4.3.1
@@ -31,6 +31,9 @@ importers:
         specifier: 2.0.0-rc.14
         version: 2.0.0-rc.14
       '@vuepress/plugin-blog':
+        specifier: 2.0.0-rc.40
+        version: 2.0.0-rc.40(vuepress@2.0.0-rc.14(@vuepress/bundler-webpack@2.0.0-rc.14)(vue@3.4.35))
+      '@vuepress/plugin-prismjs':
         specifier: 2.0.0-rc.40
         version: 2.0.0-rc.40(vuepress@2.0.0-rc.14(@vuepress/bundler-webpack@2.0.0-rc.14)(vue@3.4.35))
       '@vuepress/plugin-search':
@@ -42,6 +45,9 @@ importers:
       chart.js:
         specifier: ^4.4.3
         version: 4.4.3
+      echarts:
+        specifier: ^5.5.1
+        version: 5.5.1
       flowchart.ts:
         specifier: ^3.0.0
         version: 3.0.0
@@ -1167,6 +1173,11 @@ packages:
     peerDependencies:
       vuepress: 2.0.0-rc.14
 
+  '@vuepress/plugin-prismjs@2.0.0-rc.40':
+    resolution: {integrity: sha512-JBf9/hRHhtWCTcNXaPcR4UIec6sWiGxnTK2um+7/S6cZgeAq9jIvvkcT3ahqzqmD0LvoVo2RN2ZlK/4wHY5iOw==}
+    peerDependencies:
+      vuepress: 2.0.0-rc.14
+
   '@vuepress/plugin-reading-time@2.0.0-rc.39':
     resolution: {integrity: sha512-ChfVi6be4hAXd0XIgyfdNGayIQTzRKFZB2JFWB12+TYBJr6TQ7j6tmL7FWOiYPXUPetVPm6CfuY+mdiaBq2vqg==}
     peerDependencies:
@@ -2034,6 +2045,9 @@ packages:
 
   eastasianwidth@0.2.0:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
+
+  echarts@5.5.1:
+    resolution: {integrity: sha512-Fce8upazaAXUVUVsjgV6mBnGuqgO+JNDlcgF79Dksy4+wgGpQB2lmYoO4TSweFg/mZITdpGHomw/cNBJZj1icA==}
 
   ee-first@1.1.1:
     resolution: {integrity: sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==}
@@ -3803,6 +3817,9 @@ packages:
     resolution: {integrity: sha512-q5W7tVM71e2xjHZTlgfTDoPF/SmqKG5hddq9SzR49CH2hayqRKJtQ4mtRlSxKaJlR/+9rEM+mnBHf7I2/BQcpQ==}
     engines: {node: '>=6.10'}
 
+  tslib@2.3.0:
+    resolution: {integrity: sha512-N82ooyxVNm6h1riLCoyS9e3fuJ3AMG2zIZs2Gd1ATcSFjSA23Q0fzjjZeh0jbJvWVDZ0cJT8yaNNaaXHzueNjg==}
+
   tslib@2.6.3:
     resolution: {integrity: sha512-xNvxJEOUiWPGhUuUdQgAJPKOOJfGnIyKySOc09XkKsgdUV/3E2zvwZYdejjmRgPCgcym1juLH3226yA7sEFJKQ==}
 
@@ -4200,6 +4217,9 @@ packages:
   yoctocolors@2.1.1:
     resolution: {integrity: sha512-GQHQqAopRhwU8Kt1DDM8NjibDXHC8eoh1erhGAJPEyveY9qqVeXvVikNKrDz69sHowPMorbPUrH/mx8c50eiBQ==}
     engines: {node: '>=18'}
+
+  zrender@5.6.0:
+    resolution: {integrity: sha512-uzgraf4njmmHAbEUxMJ8Oxg+P3fT04O+9p7gY+wJRVxo8Ge+KmYv0WJev945EH4wFuc4OY2NLXz46FZrWS9xJg==}
 
 snapshots:
 
@@ -5414,6 +5434,15 @@ snapshots:
       - '@vue/composition-api'
       - typescript
 
+  '@vuepress/plugin-prismjs@2.0.0-rc.40(vuepress@2.0.0-rc.14(@vuepress/bundler-webpack@2.0.0-rc.14)(vue@3.4.35))':
+    dependencies:
+      '@vuepress/helper': 2.0.0-rc.40(vuepress@2.0.0-rc.14(@vuepress/bundler-webpack@2.0.0-rc.14)(vue@3.4.35))
+      '@vuepress/highlighter-helper': 2.0.0-rc.40(vuepress@2.0.0-rc.14(@vuepress/bundler-webpack@2.0.0-rc.14)(vue@3.4.35))
+      prismjs: 1.29.0
+      vuepress: 2.0.0-rc.14(@vuepress/bundler-webpack@2.0.0-rc.14)(vue@3.4.35)
+    transitivePeerDependencies:
+      - typescript
+
   '@vuepress/plugin-reading-time@2.0.0-rc.39(vuepress@2.0.0-rc.14(@vuepress/bundler-webpack@2.0.0-rc.14)(vue@3.4.35))':
     dependencies:
       '@vuepress/helper': 2.0.0-rc.39(vuepress@2.0.0-rc.14(@vuepress/bundler-webpack@2.0.0-rc.14)(vue@3.4.35))
@@ -6404,6 +6433,11 @@ snapshots:
       tslib: 2.6.3
 
   eastasianwidth@0.2.0: {}
+
+  echarts@5.5.1:
+    dependencies:
+      tslib: 2.3.0
+      zrender: 5.6.0
 
   ee-first@1.1.1: {}
 
@@ -8240,6 +8274,8 @@ snapshots:
 
   ts-dedent@2.2.0: {}
 
+  tslib@2.3.0: {}
+
   tslib@2.6.3: {}
 
   type-is@1.6.18:
@@ -8402,7 +8438,7 @@ snapshots:
       - '@vue/composition-api'
       - typescript
 
-  vuepress-plugin-md-enhance@2.0.0-rc.52(@vue/repl@4.3.1)(chart.js@4.4.3)(flowchart.ts@3.0.0)(katex@0.16.11)(markdown-it@14.1.0)(markmap-lib@0.16.1(markmap-common@0.17.0))(markmap-toolbar@0.16.0(markmap-common@0.17.0))(markmap-view@0.16.0(markmap-common@0.17.0))(mermaid@10.9.1)(reveal.js@5.1.0)(sass-loader@14.2.1(sass@1.77.8)(webpack@5.93.0))(vuepress@2.0.0-rc.14(@vuepress/bundler-webpack@2.0.0-rc.14)(vue@3.4.35)):
+  vuepress-plugin-md-enhance@2.0.0-rc.52(@vue/repl@4.3.1)(chart.js@4.4.3)(echarts@5.5.1)(flowchart.ts@3.0.0)(katex@0.16.11)(markdown-it@14.1.0)(markmap-lib@0.16.1(markmap-common@0.17.0))(markmap-toolbar@0.16.0(markmap-common@0.17.0))(markmap-view@0.16.0(markmap-common@0.17.0))(mermaid@10.9.1)(reveal.js@5.1.0)(sass-loader@14.2.1(sass@1.77.8)(webpack@5.93.0))(vuepress@2.0.0-rc.14(@vuepress/bundler-webpack@2.0.0-rc.14)(vue@3.4.35)):
     dependencies:
       '@mdit/plugin-alert': 0.12.0(markdown-it@14.1.0)
       '@mdit/plugin-align': 0.12.0(markdown-it@14.1.0)
@@ -8439,6 +8475,7 @@ snapshots:
     optionalDependencies:
       '@vue/repl': 4.3.1
       chart.js: 4.4.3
+      echarts: 5.5.1
       flowchart.ts: 3.0.0
       katex: 0.16.11
       markmap-lib: 0.16.1(markmap-common@0.17.0)
@@ -8468,7 +8505,7 @@ snapshots:
       - '@vue/composition-api'
       - typescript
 
-  vuepress-theme-hope@2.0.0-rc.52(@vue/repl@4.3.1)(@vuepress/plugin-search@2.0.0-rc.40(vuepress@2.0.0-rc.14(@vuepress/bundler-webpack@2.0.0-rc.14)(vue@3.4.35)))(@waline/client@3.3.0)(chart.js@4.4.3)(flowchart.ts@3.0.0)(katex@0.16.11)(markdown-it@14.1.0)(markmap-lib@0.16.1(markmap-common@0.17.0))(markmap-toolbar@0.16.0(markmap-common@0.17.0))(markmap-view@0.16.0(markmap-common@0.17.0))(mermaid@10.9.1)(reveal.js@5.1.0)(sass-loader@14.2.1(sass@1.77.8)(webpack@5.93.0))(vuepress@2.0.0-rc.14(@vuepress/bundler-webpack@2.0.0-rc.14)(vue@3.4.35)):
+  vuepress-theme-hope@2.0.0-rc.52(@vue/repl@4.3.1)(@vuepress/plugin-prismjs@2.0.0-rc.40(vuepress@2.0.0-rc.14(@vuepress/bundler-webpack@2.0.0-rc.14)(vue@3.4.35)))(@vuepress/plugin-search@2.0.0-rc.40(vuepress@2.0.0-rc.14(@vuepress/bundler-webpack@2.0.0-rc.14)(vue@3.4.35)))(@waline/client@3.3.0)(chart.js@4.4.3)(echarts@5.5.1)(flowchart.ts@3.0.0)(katex@0.16.11)(markdown-it@14.1.0)(markmap-lib@0.16.1(markmap-common@0.17.0))(markmap-toolbar@0.16.0(markmap-common@0.17.0))(markmap-view@0.16.0(markmap-common@0.17.0))(mermaid@10.9.1)(reveal.js@5.1.0)(sass-loader@14.2.1(sass@1.77.8)(webpack@5.93.0))(vuepress@2.0.0-rc.14(@vuepress/bundler-webpack@2.0.0-rc.14)(vue@3.4.35)):
     dependencies:
       '@vuepress/helper': 2.0.0-rc.39(vuepress@2.0.0-rc.14(@vuepress/bundler-webpack@2.0.0-rc.14)(vue@3.4.35))
       '@vuepress/plugin-active-header-links': 2.0.0-rc.39(vuepress@2.0.0-rc.14(@vuepress/bundler-webpack@2.0.0-rc.14)(vue@3.4.35))
@@ -8500,9 +8537,10 @@ snapshots:
       vue: 3.4.35
       vuepress: 2.0.0-rc.14(@vuepress/bundler-webpack@2.0.0-rc.14)(vue@3.4.35)
       vuepress-plugin-components: 2.0.0-rc.52(sass-loader@14.2.1(sass@1.77.8)(webpack@5.93.0))(vuepress@2.0.0-rc.14(@vuepress/bundler-webpack@2.0.0-rc.14)(vue@3.4.35))
-      vuepress-plugin-md-enhance: 2.0.0-rc.52(@vue/repl@4.3.1)(chart.js@4.4.3)(flowchart.ts@3.0.0)(katex@0.16.11)(markdown-it@14.1.0)(markmap-lib@0.16.1(markmap-common@0.17.0))(markmap-toolbar@0.16.0(markmap-common@0.17.0))(markmap-view@0.16.0(markmap-common@0.17.0))(mermaid@10.9.1)(reveal.js@5.1.0)(sass-loader@14.2.1(sass@1.77.8)(webpack@5.93.0))(vuepress@2.0.0-rc.14(@vuepress/bundler-webpack@2.0.0-rc.14)(vue@3.4.35))
+      vuepress-plugin-md-enhance: 2.0.0-rc.52(@vue/repl@4.3.1)(chart.js@4.4.3)(echarts@5.5.1)(flowchart.ts@3.0.0)(katex@0.16.11)(markdown-it@14.1.0)(markmap-lib@0.16.1(markmap-common@0.17.0))(markmap-toolbar@0.16.0(markmap-common@0.17.0))(markmap-view@0.16.0(markmap-common@0.17.0))(mermaid@10.9.1)(reveal.js@5.1.0)(sass-loader@14.2.1(sass@1.77.8)(webpack@5.93.0))(vuepress@2.0.0-rc.14(@vuepress/bundler-webpack@2.0.0-rc.14)(vue@3.4.35))
       vuepress-shared: 2.0.0-rc.52(vuepress@2.0.0-rc.14(@vuepress/bundler-webpack@2.0.0-rc.14)(vue@3.4.35))
     optionalDependencies:
+      '@vuepress/plugin-prismjs': 2.0.0-rc.40(vuepress@2.0.0-rc.14(@vuepress/bundler-webpack@2.0.0-rc.14)(vue@3.4.35))
       '@vuepress/plugin-search': 2.0.0-rc.40(vuepress@2.0.0-rc.14(@vuepress/bundler-webpack@2.0.0-rc.14)(vue@3.4.35))
       sass-loader: 14.2.1(sass@1.77.8)(webpack@5.93.0)
     transitivePeerDependencies:
@@ -8718,3 +8756,7 @@ snapshots:
       yargs-parser: 18.1.3
 
   yoctocolors@2.1.1: {}
+
+  zrender@5.6.0:
+    dependencies:
+      tslib: 2.3.0
