@@ -3,9 +3,11 @@
  * docs: https://theme-hope.vuejs.press/zh/
  */
 import { hopeTheme } from "vuepress-theme-hope";
+import { copyCodePlugin } from '@vuepress/plugin-copy-code'
 import navbar from "./navbar.js";
 // 我们默认导出了主题对象
 export default hopeTheme({
+    darkmode: "switch",
     hostname: "https://github.com/Sewar-x/myblog/",
     author: {
         name: "Sewen",
@@ -20,12 +22,30 @@ export default hopeTheme({
         end: ["Language", "Repo", "Outlook", "Search"],
     },
     plugins: {
+        copyCodePlugin: {
+            showInMobile: true
+        },
+        shiki: {
+            // 你想要使用的主题
+            themes: {
+                light: "one-light",
+                dark: "one-dark-pro",
+            },
+        },
         blog: true,
-        prismjs: true,
+        prismjs: {
+            theme: {
+                light: 'ghcolors',
+                dark: 'coldark-dark'
+            },
+            notationDiff: true,
+            notationErrorLevel: true,
+            notationWordHighlight: true
+        },
         search: true,
-        watermark:true,
+        watermark: true,
         mdEnhance: {
-             // 你想使用的组件
+            // 你想使用的组件
             components: [
                 "Badge",
                 "CodePen",
@@ -83,7 +103,7 @@ export default hopeTheme({
             //代码块分组: https://theme-hope.vuejs.press/zh/guide/markdown/code/code-tabs.html
             codetabs: false,
             // !代码演示: https://theme-hope.vuejs.press/zh/guide/markdown/code/demo.html
-            demo: true
+            demo: false
         },
         copyright: {
             global: true,
